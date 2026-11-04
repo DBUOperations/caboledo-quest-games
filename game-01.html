@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Miro Interactive Test</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #201537;
+    color: white;
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+    margin: 0;
+  }
+  main { text-align: center; padding: 24px; }
+  #count { font-size: 60px; color: #ffe500; }
+  button {
+    padding: 14px 24px;
+    margin: 8px;
+    border: 0;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Miro Interactive Test</h1>
+  <div id="count">0</div>
+  <button id="plus">+1 Click</button>
+  <button id="reset">Reset</button>
+</main>
+<script>
+  let count = 0;
+  const display = document.getElementById("count");
+
+  document.getElementById("plus").addEventListener("click", () => {
+    count++;
+    display.textContent = count;
+  });
+
+  document.getElementById("reset").addEventListener("click", () => {
+    count = 0;
+    display.textContent = count;
+  });
+</script>
+</body>
+</html>
