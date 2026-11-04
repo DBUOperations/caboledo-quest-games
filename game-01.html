@@ -1,50 +1,97 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Miro Interactive Test</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    background: #201537;
-    color: white;
-    display: grid;
-    place-items: center;
-    min-height: 100vh;
-    margin: 0;
-  }
-  main { text-align: center; padding: 24px; }
-  #count { font-size: 60px; color: #ffe500; }
-  button {
-    padding: 14px 24px;
-    margin: 8px;
-    border: 0;
-    border-radius: 8px;
-    cursor: pointer;
-  }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Caboledo Quest</title>
+  <style>
+    :root{--accent:#f5d900;--ink:#f8f6ff;--muted:#c5b9dd;--panel:#33235b;--bg:#1c1239;--line:#766397}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at top left,#49317a 0%,var(--bg) 65%);font:15px/1.48 Inter,Arial,sans-serif;color:var(--ink)}
+    button,input{font:inherit}button{cursor:pointer}main{width:min(100%,800px);margin:auto;padding:22px 22px 28px}
+    header{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:18px}
+    .brand{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);font-weight:800}
+    .smallbtn{padding:7px 11px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:12px}
+    h1{font-size:clamp(23px,4vw,32px);line-height:1.13;margin:5px 0 9px}h2{font-size:20px;line-height:1.3;margin:6px 0 12px}
+    .subtitle,.desc{color:var(--muted)}.subtitle{margin:0 0 16px}.label{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--accent)}
+    .progress{height:7px;background:#594775;border-radius:999px;overflow:hidden;margin:0 0 22px}.fill{height:100%;background:var(--accent);width:0;transition:width .25s}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:clamp(18px,4vw,29px);box-shadow:0 18px 45px #13092355}
+    .choices{display:grid;gap:9px;margin:19px 0}.choice{width:100%;padding:13px 15px;text-align:left;background:#49356e;border:1px solid #826fa5;color:var(--ink);border-radius:11px;transition:.15s}
+    .choice:hover,.choice:focus-visible{border-color:var(--accent)}.choice.selected{background:#72538d;border:2px solid var(--accent);padding:12px 14px}
+    .answer{width:100%;border:1px solid #937dac;border-radius:10px;padding:14px;background:#20153d;color:white;margin:12px 0 18px}
+    .reorder{list-style:none;padding:0;margin:16px 0}.reorder li{display:flex;gap:9px;align-items:center;justify-content:space-between;padding:10px 12px;background:#49356e;border-radius:9px;margin-bottom:7px}
+    .reorder .controls{display:flex;gap:6px}.reorder button{border-radius:6px;border:1px solid #b49fd2;color:white;background:#685384;padding:4px 9px}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:18px}.primary{border:0;border-radius:10px;background:var(--accent);color:#201536;font-weight:800;padding:12px 21px}.primary:disabled{opacity:.43;cursor:not-allowed}
+    .status{padding:11px 13px;border-radius:9px;margin-top:14px;background:#422b61;color:#e8dfff;min-height:44px}.status.good{background:#214b38;color:#b5ffd6}.status.bad{background:#623645;color:#ffe2e8}
+    .hidden{display:none!important}.score{font-size:54px;color:var(--accent);font-weight:900;margin:10px 0}.footer{color:var(--muted);font-size:11px;margin:16px 3px 0}
+    @media(max-width:440px){main{padding:13px}.card{border-radius:13px}.choices{gap:7px}h2{font-size:18px}}
+  </style>
 </head>
 <body>
-<main>
-  <h1>Miro Interactive Test</h1>
-  <div id="count">0</div>
-  <button id="plus">+1 Click</button>
-  <button id="reset">Reset</button>
-</main>
-<script>
-  let count = 0;
-  const display = document.getElementById("count");
-
-  document.getElementById("plus").addEventListener("click", () => {
-    count++;
-    display.textContent = count;
-  });
-
-  document.getElementById("reset").addEventListener("click", () => {
-    count = 0;
-    display.textContent = count;
-  });
-</script>
+  <script type="application/json" id="quest-data">{"title":"Mission Morgenplanung","subtitle":"Sortiere Aufgaben, setze Prioritäten und schließe deinen Arbeitstag strukturiert ab.","accent":"#FFDD00","tasks":[{"type":"choice","question":"Welche Aufgabe solltest du bei der morgendlichen Sichtung zuerst ganz oben einordnen, wenn du nach Dringlichkeit sortierst?","instruction":"","explanation":"Eine Aufgabe mit unmittelbar bevorstehendem Termin ist am dringendsten und gehört zuerst bearbeitet oder vorbereitet.","hint":"Achte auf die kürzeste Zeit bis zur Fälligkeit.","options":["Kundenanruf in 10 Minuten vorbereiten","Newsletter-Ideen für nächsten Monat sammeln","Schreibtisch dekorieren","Alte Dateien umbenennen"],"correctIndex":0},{"type":"order","question":"Bringe die fünf Etappen eines sinnvollen Tagesplan-Prototyps in die richtige Reihenfolge.","instruction":"","explanation":"Erst sammelst du alles, dann sortierst du, wählst Prioritäten, arbeitest sie ab und wertest den Tag am Ende aus.","hint":"","items":["Aufgaben sammeln","Nach Dringlichkeit sortieren","Prioritäten setzen","Aufgaben erledigen","Tag abschließen"]},{"type":"choice","question":"Welche Auswahl ist die beste Gruppe aus drei Prioritäten, wenn genau diese Aufgaben vorliegen?","instruction":"","explanation":"Prioritäten sollten sich an hoher Dringlichkeit und großer Wirkung orientieren; technische Störung, feste Deadline und nahes Meeting erfüllen das am besten.","hint":"Suche die drei Aufgaben mit direktem Zeitdruck oder hohem geschäftlichem Risiko.","options":["Serverfehler beheben, Angebotsfrist um 12 Uhr senden, Teammeeting in 30 Minuten vorbereiten","Büropflanze gießen, Icons neu sortieren, Farben für Präsentation testen","Leseliste aktualisieren, Postfach-Design ändern, Urlaubsfotos sichern","Namensschilder alphabetisch legen, Papierkorb leeren, Chat-Emoji auswählen"],"correctIndex":0},{"type":"truefalse","question":"Eine Aufgabe zu delegieren kann sinnvoll sein, wenn sie wichtig ist, aber nicht persönlich von dir erledigt werden muss.","instruction":"","explanation":"Delegieren spart Zeit für deine Kernaufgaben, solange Verantwortung und Ergebnis klar geregelt sind.","hint":"","correctIndex":0},{"type":"text","question":"Wie heißt der Bereich für Aufgaben, die du bewusst nicht heute erledigst, sondern auf später verschiebst?","instruction":"","explanation":"Der Bereich „Später“ sammelt Aufgaben, die nicht dringend genug für den heutigen Plan sind.","hint":"","answer":"Später","alternatives":["später-bereich","spaeter","spaeter-bereich"]},{"type":"choice","question":"Wann ist der Tagesabschluss im Prototyp am sinnvollsten erreicht?","instruction":"","explanation":"Das Ziel ist ein strukturierter Tagesplan mit klaren Prioritäten und sichtbar bearbeiteten Aufgaben, nicht zwingend das vollständige Leeren aller Listen.","hint":"Denk an das Ziel des Prototyps: Überblick, Prioritäten und ein nachvollziehbarer Plan.","options":["Wenn die Aufgaben sortiert sind, drei Prioritäten feststehen und erledigte Aufgaben in der Zusammenfassung sichtbar sind","Sobald eine einzige Aufgabe angeklickt wurde","Direkt nach dem Startbildschirm","Erst wenn wirklich jede Aufgabe aus allen Listen verschwunden ist"],"correctIndex":0}]}</script>
+  <main>
+    <header><span class="brand">Caboledo · Interactive Quest</span><button class="smallbtn" id="restart" type="button">↻ Neustart</button></header>
+    <h1 id="title"></h1><p class="subtitle" id="subtitle"></p>
+    <div class="progress"><div class="fill" id="fill"></div></div>
+    <section class="card" id="activity">
+      <span class="label" id="step"></span><h2 id="question"></h2><p class="desc" id="instruction"></p>
+      <div id="input-area"></div><div class="status hidden" id="status" role="status" aria-live="polite"></div>
+      <div class="actions"><button class="primary" id="check" type="button">Antwort prüfen</button><button class="primary hidden" id="next" type="button">Weiter →</button></div>
+    </section>
+    <section class="card hidden" id="complete" aria-live="polite">
+      <span class="label">Quest abgeschlossen!</span><h2>Super gemacht!</h2>
+      <p>Du hast alle Aufgaben abgeschlossen.</p><div class="score" id="score"></div>
+      <button class="primary" id="again" type="button">Nochmal spielen</button>
+    </section>
+    <p class="footer">Offline spielbar · Keine externen Dienste · Dein Fortschritt bleibt in dieser Sitzung</p>
+  </main>
+  <script>
+    (function(){
+      'use strict';
+      const cfg=JSON.parse(document.getElementById('quest-data').textContent);
+      const $=id=>document.getElementById(id);
+      $('title').textContent=cfg.title||'Dein Quest';
+      $('subtitle').textContent=cfg.subtitle||'Sechs abwechslungsreiche Aufgaben';
+      if(/^#[\da-f]{6}$/i.test(cfg.accent||''))document.documentElement.style.setProperty('--accent',cfg.accent);
+      const tasks=cfg.tasks||[];let index=0,selected=null,order=[],completed=false,wrong=0;
+      function text(tag,content,cls){const el=document.createElement(tag);el.textContent=content||'';if(cls)el.className=cls;return el}
+      function norm(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('de-DE').replace(/ß/g,'ss').replace(/[^\p{L}\p{N}]+/gu,' ').trim()}
+      function showStatus(message,kind){const el=$('status');el.className='status'+(kind?' '+kind:'');el.textContent=message}
+      function shuffle(arr){const copy=arr.slice();for(let i=copy.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[copy[i],copy[j]]=[copy[j],copy[i]]}if(copy.length>1&&copy.every((x,i)=>x===arr[i]))[copy[0],copy[1]]=[copy[1],copy[0]];return copy}
+      function renderOrder(){const area=$('input-area');area.replaceChildren();const ul=text('ul','','reorder');order.forEach((label,i)=>{const li=document.createElement('li');li.append(text('span',label));const ctl=text('div','','controls');for(const [symbol,delta] of [['↑',-1],['↓',1]]){const b=text('button',symbol);b.type='button';b.setAttribute('aria-label',symbol==='↑'?'Nach oben':'Nach unten');b.disabled=completed||i+delta<0||i+delta>=order.length;b.onclick=()=>{[order[i],order[i+delta]]=[order[i+delta],order[i]];renderOrder()};ctl.append(b)}li.append(ctl);ul.append(li)});area.append(ul)}
+      function render(){
+        if(index>=tasks.length){$('activity').classList.add('hidden');$('complete').classList.remove('hidden');$('fill').style.width='100%';$('score').textContent=tasks.length+' / '+tasks.length;return}
+        const t=tasks[index];selected=null;completed=false;
+        $('step').textContent='Aufgabe '+(index+1)+' von '+tasks.length;
+        $('question').textContent=t.question||t.title||'Deine Aufgabe';
+        $('instruction').textContent=t.instruction||({choice:'Wähle die richtige Antwort.',truefalse:'Ist diese Aussage richtig?',text:'Schreibe deine Antwort.',order:'Bringe die Schritte in die richtige Reihenfolge.'}[t.type]||'');
+        $('status').className='status hidden';$('status').textContent='';$('check').classList.remove('hidden');$('next').classList.add('hidden');$('fill').style.width=(100*index/tasks.length)+'%';
+        const area=$('input-area');area.replaceChildren();
+        if(t.type==='choice'||t.type==='truefalse'){
+          const options=t.type==='truefalse'?['Richtig','Falsch']:t.options;
+          const list=text('div','','choices');options.forEach((label,i)=>{const b=text('button',label,'choice');b.type='button';b.onclick=()=>{selected=i;for(const c of list.children)c.classList.remove('selected');b.classList.add('selected')};list.append(b)});area.append(list);
+        }else if(t.type==='text'){
+          const inp=document.createElement('input');inp.className='answer';inp.type='text';inp.placeholder='Deine Antwort...';inp.autocomplete='off';inp.id='answer';inp.addEventListener('keydown',e=>{if(e.key==='Enter')$('check').click()});area.append(inp);
+        }else if(t.type==='order'){
+          order=shuffle(t.items);renderOrder();
+        }else{area.append(text('p','Unbekannter Aufgabentyp.','desc'))}
+      }
+      $('check').addEventListener('click',()=>{
+        if(completed)return;const t=tasks[index];let correct=false;
+        if(t.type==='choice'||t.type==='truefalse'){
+          if(selected===null){showStatus('Bitte zuerst eine Antwort wählen.','bad');return}
+          correct=selected===Number(t.correctIndex);
+        }else if(t.type==='text'){
+          const answer=$('answer').value;if(!answer.trim()){showStatus('Bitte eine Antwort eingeben.','bad');return}
+          correct=[t.answer,...(Array.isArray(t.alternatives)?t.alternatives:[])].some(x=>norm(x)===norm(answer));
+        }else if(t.type==='order')correct=order.every((v,i)=>v===t.items[i]);
+        if(correct){completed=true;$('check').classList.add('hidden');$('next').classList.remove('hidden');showStatus('✓ Richtig! '+(t.explanation||'Sehr gut!'),'good');if(t.type==='order')renderOrder()}
+        else{wrong++;showStatus('Noch nicht ganz. Versuch es erneut!'+(t.hint?' Tipp: '+t.hint:''),'bad')}
+      });
+      $('next').addEventListener('click',()=>{if(completed){index++;render()}});
+      function restart(){index=0;wrong=0;$('activity').classList.remove('hidden');$('complete').classList.add('hidden');render()}
+      $('restart').addEventListener('click',restart);$('again').addEventListener('click',restart);
+      if(tasks.length)restart();else{showStatus('Es wurden keine Aufgaben geliefert.','bad');$('check').disabled=true}
+    })();
+  </script>
 </body>
 </html>
