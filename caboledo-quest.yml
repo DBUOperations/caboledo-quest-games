@@ -1,0 +1,29 @@
+name: Caboledo Quest – Browser Test and Publish
+run-name: Caboledo Quest ${{ github.event.client_payload.slot }} / ${{ github.event.client_payload.request_id }}
+
+on:
+  repository_dispatch:
+    types: [caboledo_quest_verify]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: caboledo-quest-${{ github.event.client_payload.slot }}
+  cancel-in-progress: true
+
+jobs:
+  verify-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install headless Chromium
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Test generated HTML and publish only on success
+        run: node scripts/quest-verify.mjs
