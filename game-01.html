@@ -4,279 +4,399 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; font-src data:; media-src data: blob:; connect-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Lern-Snake</title>
+<title>Snake · Workshop</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}body{font:13px system-ui,sans-serif;background:#f3f5f7;color:#182b38}button,input,select,textarea{font:inherit;color:inherit}button,select,input,textarea{border:1px solid #aebbc5;border-radius:5px;background:white;min-width:0}button{cursor:pointer;padding:5px 10px}button:disabled{cursor:default;opacity:.55}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #08756b;outline-offset:1px}
-.app{width:100%;height:100dvh;padding:8px;display:flex;flex-direction:column;gap:7px;min-height:0;min-width:0}
-header{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:none}h1{font-size:18px;margin:0}#score{font-weight:600;font-variant-numeric:tabular-nums;font-size:12px}
-.settings{display:grid;grid-template-columns:1.15fr 1.1fr .7fr .85fr 1fr auto;gap:6px;align-items:end;flex:none}
-label{display:flex;flex-direction:column;gap:2px;font-size:11px;min-width:0}select,input{height:28px;padding:3px 5px;width:100%}.settings button{height:28px;background:#08756b;color:white;border-color:#08756b}
-main{display:grid;grid-template-columns:minmax(0,1fr) 196px;gap:8px;flex:1;min-height:0;min-width:0}
-.game{display:grid;grid-template-rows:32px minmax(0,1fr) 37px 28px;gap:4px;min-height:0;min-width:0}
-#question{margin:0;font-size:13px;line-height:16px;display:flex;align-items:center;font-weight:650}
-.field{min-height:0;min-width:0;background:#162c37;border-radius:5px;overflow:hidden}canvas{display:block;width:100%;height:100%}
-#feedback{font-size:12px;line-height:17px;margin:0;overflow:hidden}.steer{display:flex;align-items:center;justify-content:center;gap:6px}.steer button{padding:0;width:40px;height:28px;font-size:18px;touch-action:none}.steer span{font-size:10px;color:#526571;margin-left:4px}
-aside{display:flex;flex-direction:column;gap:7px;min-width:0;min-height:0;padding:8px;background:#fff;border:1px solid #d4dde3;border-radius:5px}
-.progress{font-size:11px;line-height:16px}.progress strong{font-size:12px}.small{font-size:10px;color:#536773;line-height:14px}.lists{margin-top:3px;font-size:10px;line-height:14px;overflow-wrap:anywhere}
-.notes{display:flex;flex-direction:column;gap:6px;min-height:0}textarea{resize:none;width:100%;height:37px;min-height:32px;padding:4px 5px}#action{font-size:12px}
-.done{display:flex;flex-direction:row;align-items:center;gap:5px;font-size:11px}.done input{width:15px;height:15px;margin:0;flex:none}#task{font-size:11px;line-height:15px}
-@media(max-width:520px){
-.app{padding:6px;gap:5px}.settings{grid-template-columns:1fr 1fr 1fr;gap:4px}.settings label{font-size:10px}.settings button{width:100%}main{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto;gap:5px}aside{display:grid;grid-template-columns:.95fr 1.2fr;gap:7px;padding:6px}.notes{gap:3px}.progress{line-height:14px}.lists{font-size:9px;line-height:12px}textarea{height:32px}#action{height:25px}.game{grid-template-rows:32px minmax(0,1fr) 35px 26px;gap:3px}.steer button{height:26px}.small{font-size:9px;line-height:12px}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden}
+body{font-family:system-ui,sans-serif;background:#f1f5f3;color:#16362b}
+.app{width:100%;height:100vh;height:100dvh;min-width:0;min-height:0;display:flex;flex-direction:column;gap:5px;padding:8px;max-width:1000px;margin:auto}
+header{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+h1{font-size:18px;line-height:1.2;margin:0}
+.keys{font-size:11px;color:#496357}
+.stats{display:flex;gap:5px 15px;flex-wrap:wrap;font-size:12px;font-variant-numeric:tabular-nums}
+.stats b{font-weight:750}
+.info{background:#fff;border:1px solid #d4dfd9;border-radius:5px;padding:5px 8px;flex:none}
+#title{font-size:13px;font-weight:700;line-height:1.3}
+#detail{font-size:12px;line-height:1.3;color:#496357;margin-top:2px}
+.board{position:relative;flex:1;min-height:0;min-width:0;overflow:hidden;border:2px solid #527866;border-radius:4px;background:#122c23}
+canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.answer{position:absolute;display:flex;align-items:center;justify-content:center;text-align:center;padding:5px;border:2px solid #86c6e7;border-radius:4px;background:#e6f4fd;color:#12364d;font-weight:700;font-size:clamp(11px,1.65vw,14px);line-height:1.2;overflow-wrap:break-word;pointer-events:none}
+.answer[hidden]{display:none}
+footer{display:flex;align-items:center;justify-content:space-between;gap:5px;flex:none}
+.actions,.directions{display:flex;gap:4px}
+button{border:1px solid #adc2b6;border-radius:5px;background:#fff;color:#16362b;font:600 12px system-ui;min-height:36px;padding:6px 11px;touch-action:manipulation;cursor:pointer}
+button:focus-visible{outline:3px solid #388ec0;outline-offset:1px}
+button:active:not(:disabled){background:#cfe7d8}
+button:disabled{opacity:.45;cursor:default}
+#main{background:#236447;color:#fff;border-color:#236447;min-width:67px}
+.directions button{font-size:19px;width:38px;padding:2px}
+@media(max-width:400px){
+.app{padding:5px;gap:4px}
+header{gap:3px}
+h1{font-size:16px}
+.keys{font-size:10px}
+.stats{gap:3px 9px;font-size:11px}
+button{padding:5px 8px;min-height:34px}
+.directions button{width:32px}
+#main{min-width:60px}
 }
-@media(max-height:390px) and (min-width:521px){.app{padding:6px;gap:4px}aside{gap:4px;padding:6px}.notes{gap:4px}.game{grid-template-rows:29px minmax(0,1fr) 34px 26px;gap:3px}.steer button{height:26px}h1{font-size:16px}.lists{line-height:12px}textarea{height:32px}}
 </style>
 </head>
 <body>
-<div class="app">
-<header><h1>Lern-Snake</h1><div id="score">Punkte: 0 · 0:30</div></header>
-<div class="settings">
-<label>Workshop<select id="workshop"><option value="kommunikation">Kommunikation</option><option value="teamarbeit">Teamarbeit</option></select></label>
-<label>Thema<select id="topic"></select></label>
-<label>Rundendauer<select id="duration"><option value="30">30 Sek.</option><option value="60">1 Min.</option><option value="120">2 Min.</option></select></label>
-<label>Tempo<select id="speed"><option value="240">Langsam</option><option value="160" selected>Mittel</option><option value="100">Schnell</option></select></label>
-<label>Üben<select id="mode"><option value="all">Alle Inhalte</option><option value="unsure">Nur unsichere</option></select></label>
-<button id="start">Start</button>
+<main class="app">
+<header>
+<h1>Snake · Workshop</h1>
+<span class="keys">Pfeile / WASD / Bildschirmtasten</span>
+</header>
+<div class="stats">
+<span>Punkte: <b id="points">0</b></span>
+<span>Highscore: <b id="high">0</b></span>
+<span id="learning">Gelernt: 0/5</span>
+<span>Münzen: <b id="coins">0/9</b></span>
 </div>
-<main>
-<section class="game" aria-label="Snake-Lernspiel">
-<p id="question"></p>
-<div class="field"><canvas id="board" aria-label="Snake mit drei essbaren Antwortfeldern. Steuerung mit Pfeiltasten oder Pfeilknöpfen."></canvas></div>
-<p id="feedback" role="status" aria-live="polite"></p>
-<div class="steer" aria-label="Steuerung">
+<section class="info" aria-live="polite" aria-atomic="true">
+<div id="title"></div>
+<div id="detail"></div>
+</section>
+<div class="board" id="board">
+<canvas id="canvas" role="img" aria-label="Snake-Spielfeld: Schlange, Münze und bei Fragen zwei essbare Antwortfelder"></canvas>
+<div class="answer" id="answer0" hidden></div>
+<div class="answer" id="answer1" hidden></div>
+</div>
+<footer>
+<div class="actions">
+<button id="main" type="button">Start</button>
+<button id="restart" type="button">Neustart</button>
+</div>
+<div class="directions" role="group" aria-label="Schlange steuern">
 <button type="button" data-dir="left" aria-label="Links">←</button>
 <button type="button" data-dir="up" aria-label="Oben">↑</button>
 <button type="button" data-dir="down" aria-label="Unten">↓</button>
 <button type="button" data-dir="right" aria-label="Rechts">→</button>
-<span>Pfeiltasten / Tippen</span>
 </div>
-</section>
-<aside>
-<div class="progress">
-<strong>Lernfortschritt</strong>
-<div id="counts"></div>
-<div class="small">Sicher: richtig in zwei verschiedenen Runden.</div>
-<div id="lists" class="lists"></div>
-<div id="saved" class="small"></div>
-</div>
-<div class="notes">
-<label>Meine Erkenntnis<textarea id="insight" maxlength="240" placeholder="Das nehme ich mit …"></textarea></label>
-<label>Maßnahme im Arbeitsalltag<input id="action" maxlength="120" placeholder="Was tue ich bis wann?"></label>
-<label class="done"><input type="checkbox" id="done">Maßnahme erledigt</label>
-<div id="task"></div>
-</div>
-</aside>
+</footer>
 </main>
-</div>
 <script>
-const catalog={
-kommunikation:{name:"Kommunikation",topics:{
-feedback:{name:"Feedback",questions:[
-{id:"f1",tag:"Beobachtung",q:"Womit beginnt hilfreiches Feedback?",a:["Beobachtung","Vorwurf","Ratschlag"],c:0,e:"Beschreibe zuerst konkret, was du beobachtet hast."},
-{id:"f2",tag:"Ich-Botschaft",q:"Welche Formulierung ist eine Ich-Botschaft?",a:["Du störst!","Ich bin irritiert","Du bist unfair"],c:1,e:"Ich-Botschaften benennen das eigene Erleben statt zu urteilen."},
-{id:"f3",tag:"Bitte",q:"Wie wird aus Feedback ein nächster Schritt?",a:["Druck machen","Schweigen","Konkrete Bitte"],c:2,e:"Eine konkrete Bitte macht die gewünschte Veränderung umsetzbar."}
-]},
-zuhoeren:{name:"Zuhören",questions:[
-{id:"z1",tag:"Paraphrase",q:"Was bedeutet Paraphrasieren?",a:["Widersprechen","Zusammenfassen","Unterbrechen"],c:1,e:"Gib das Gehörte in eigenen Worten wieder."},
-{id:"z2",tag:"Offene Frage",q:"Welche Frage lädt zum Erzählen ein?",a:["Alles klar?","War es gut?","Was war wichtig?"],c:2,e:"Offene Fragen lassen Raum für eine ausführliche Antwort."},
-{id:"z3",tag:"Verstehen",q:"Was hilft, Missverständnisse zu klären?",a:["Nachfragen","Vermuten","Thema wechseln"],c:0,e:"Prüfe dein Verständnis durch gezieltes Nachfragen."}
-]}
-}},
-teamarbeit:{name:"Teamarbeit",topics:{
-prioritaeten:{name:"Prioritäten",questions:[
-{id:"p1",tag:"Wichtig",q:"Eine wichtige, nicht dringende Aufgabe sollte man …",a:["Ignorieren","Einplanen","Sofort stoppen"],c:1,e:"Plane wichtige Aufgaben ein, bevor sie dringend werden."},
-{id:"p2",tag:"Fokus",q:"Was unterstützt konzentrierte Arbeit?",a:["Multitasking","Ständig chatten","Fokuszeit"],c:2,e:"Geschützte Fokuszeit reduziert Unterbrechungen."},
-{id:"p3",tag:"Nächster Schritt",q:"Wie wird eine große Aufgabe handhabbar?",a:["Kleiner Schritt","Mehr abwarten","Alles zugleich"],c:0,e:"Definiere einen kleinen, konkret ausführbaren nächsten Schritt."}
-]},
-zusammenarbeit:{name:"Zusammenarbeit",questions:[
-{id:"t1",tag:"Verantwortung",q:"Was braucht eine verlässlich verteilte Aufgabe?",a:["Viele Kopien","Klare Zuständigkeit","Nur eine Idee"],c:1,e:"Eine klar benannte Person übernimmt die Verantwortung."},
-{id:"t2",tag:"Retrospektive",q:"Wozu dient eine Retrospektive?",a:["Schuld suchen","Status vorlesen","Verbessern"],c:2,e:"Das Team reflektiert die Zusammenarbeit und vereinbart Verbesserungen."},
-{id:"t3",tag:"Fertig",q:"Was hilft beim gemeinsamen Verständnis von „fertig“?",a:["Klare Kriterien","Ein gutes Gefühl","Zeitdruck"],c:0,e:"Gemeinsame Fertig-Kriterien machen Ergebnisse überprüfbar."}
-]}
-}}
-};
-const $=id=>document.getElementById(id);
-const ws=$("workshop"),topic=$("topic"),duration=$("duration"),speed=$("speed"),mode=$("mode"),start=$("start");
-const canvas=$("board"),ctx=canvas.getContext("2d");
-const key="lernsnake-frame-b-v1";
-let store={learn:{},notes:{}},persistent=true;
-try{const data=JSON.parse(localStorage.getItem(key));if(data&&data.learn&&data.notes)store=data;}catch(e){persistent=false;}
-let active=false,phase="idle",roundId=0,points=0,length=3,snake=[],dir={x:1,y:0},nextDir={x:1,y:0};
-let queue=[],current=null,remaining=30,endsAt=0,holdUntil=0,accumulator=0,lastTime=0;
-let width=1,height=1,unit=1,offsetX=0,offsetY=0,highlight=-1;
-const cols=24,rows=12;
-const pads=[{x:1,y:2,w:7,h:3},{x:9,y:2,w:7,h:3},{x:17,y:2,w:6,h:3}];
+const QUESTIONS = [
+  {
+    id:"gamification",
+    question:"Was bedeutet Gamification?",
+    correct:"Spielelemente im Alltag einsetzen",
+    wrong:"Jede Aufgabe zum Videospiel machen",
+    explanation:"Gamification nutzt Spielelemente in spielfremden Zusammenhängen."
+  },
+  {
+    id:"feedback",
+    question:"Was ist unmittelbares Feedback?",
+    correct:"Direkt eine Rückmeldung erhalten",
+    wrong:"Erst am Kursende ein Ergebnis sehen",
+    explanation:"Die Rückmeldung folgt direkt auf die Handlung."
+  },
+  {
+    id:"autonomie",
+    question:"Was bedeutet Autonomie beim Lernen?",
+    correct:"Mitentscheiden können",
+    wrong:"Keine Wahlmöglichkeiten haben",
+    explanation:"Lernende können beispielsweise Thema oder Schwierigkeit wählen."
+  },
+  {
+    id:"fortschritt",
+    question:"Was zeigt eine Fortschrittsanzeige?",
+    correct:"Den erreichten Stand",
+    wrong:"Die Erklärung neuer Inhalte",
+    explanation:"Sie zeigt, was geschafft wurde und was noch offen ist."
+  },
+  {
+    id:"transfer",
+    question:"Was bedeutet Transfer nach einem Workshop?",
+    correct:"Gelerntes im Alltag anwenden",
+    wrong:"Nur Spielpunkte sammeln",
+    explanation:"Workshop-Inhalte werden auf konkrete Alltagssituationen übertragen."
+  }
+];
+const $ = id => document.getElementById(id);
+const board=$("board"), canvas=$("canvas"), ctx=canvas.getContext("2d");
+const fields=[$("answer0"),$("answer1")];
+const controls=[...document.querySelectorAll("[data-dir]")];
+const COLS=20, ROWS=14, STORE="snake-workshop-v1";
 const vectors={left:{x:-1,y:0},right:{x:1,y:0},up:{x:0,y:-1},down:{x:0,y:1}};
-function questions(){return catalog[ws.value].topics[topic.value].questions;}
-function noteKey(){return ws.value+"/"+topic.value;}
-function record(q){return store.learn[q.id]||{level:0,last:0};}
-function save(){try{localStorage.setItem(key,JSON.stringify(store));persistent=true;}catch(e){persistent=false;}$("saved").textContent=persistent?"Automatisch lokal gespeichert":"Speicherung nur in dieser Sitzung";}
-function refreshProgress(){
-const qs=questions(),right=qs.filter(q=>record(q).level>0),secure=qs.filter(q=>record(q).level>=2),practice=qs.filter(q=>record(q).level<2);
-$("counts").textContent=`Richtig: ${right.length}/${qs.length} · Sicher: ${secure.length}/${qs.length}`;
-$("lists").replaceChildren();
-for(const [label,items] of [["Richtig",right],["Weiter üben",practice]]){
-const line=document.createElement("div");line.textContent=label+": "+(items.map(q=>q.tag).join(", ")||"–");$("lists").append(line);
+let high=0, learned=new Set(), persistent=true;
+try{
+  const data=JSON.parse(localStorage.getItem(STORE)||"{}");
+  if(Number.isFinite(data.high)) high=Math.max(0,Math.floor(data.high));
+  if(Array.isArray(data.learned)){
+    learned=new Set(data.learned.filter(id=>QUESTIONS.some(q=>q.id===id)));
+  }
+  localStorage.setItem(STORE,JSON.stringify({high,learned:[...learned]}));
+}catch(e){persistent=false}
+let snake=[], direction=vectors.right, turns=[], coin=null, points=0, count=0;
+let state="ready", active=null, queue=[], result=null, endText="";
+let width=1,height=1,accumulator=0,lastTime=0;
+function save(){
+  high=Math.max(high,points);
+  try{localStorage.setItem(STORE,JSON.stringify({high,learned:[...learned]}))}
+  catch(e){persistent=false}
 }
+function hud(){
+  $("points").textContent=points;
+  $("high").textContent=high;
+  $("coins").textContent=count+"/9";
+  $("learning").textContent="Gelernt: "+learned.size+"/"+QUESTIONS.length+(persistent?"":" · nur Sitzung");
+  controls.forEach(button=>button.disabled=state!=="running");
+  $("main").textContent=state==="running"?"Pause":state==="paused"||state==="feedback"?"Weiter":"Start";
+  let title="",detail="";
+  if(state==="ready"){
+    title="Bereit? Mit Start geht’s los.";
+    detail="Münze +1 und Wachstum. Jede 9. Münze startet eine Frage.";
+  }else if(state==="over"){
+    title=endText;
+    detail="Starte erneut. Dein Lernfortschritt bleibt erhalten.";
+  }else if(state==="feedback"){
+    title=result.correct?"Richtig! +10 Punkte und Wachstum.":"Falsch. Richtig: "+result.question.correct;
+    detail=result.question.explanation;
+  }else if(active){
+    title=(state==="paused"?"Pause · ":"")+active.question.question;
+    detail=state==="paused"?"Mit Weiter fortsetzen.":"Friss das richtige Antwortfeld · langsames Tempo.";
+  }else{
+    title=state==="paused"?"Pause":"Noch "+(9-count)+" Münze"+(9-count===1?"":"n")+" bis zur Frage.";
+    detail=state==="paused"?"Mit Weiter fortsetzen.":"Wand und Körper meiden · richtige Antwort +10 und Wachstum.";
+  }
+  $("title").textContent=title;
+  $("detail").textContent=detail;
 }
-function loadNotes(){
-const n=store.notes[noteKey()]||{};
-$("insight").value=n.insight||"";$("action").value=n.action||"";$("done").checked=!!n.done;updateTask();
+function makeCoin(){
+  const empty=[];
+  for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){
+    if(!snake.some(p=>p.x===x&&p.y===y))empty.push({x,y});
+  }
+  if(!empty.length){finish("Geschafft! Das ganze Feld ist gefüllt.");return}
+  coin=empty[Math.floor(Math.random()*empty.length)];
 }
-function updateTask(){
-const exists=$("action").value.trim().length>0;
-$("done").disabled=!exists;
-if(!exists)$("done").checked=false;
-$("task").textContent=`Dashboard: ${exists&&$("done").checked?1:0}/${exists?1:0} Aufgaben erledigt`+($("insight").value.trim()?" · Erkenntnis notiert":"");
+function reset(start=false){
+  snake=[{x:5,y:7},{x:4,y:7},{x:3,y:7}];
+  direction=vectors.right;
+  turns=[];
+  coin=null;
+  points=0;
+  count=0;
+  active=null;
+  result=null;
+  endText="";
+  accumulator=0;
+  queue=QUESTIONS.filter(q=>!learned.has(q.id)).concat(QUESTIONS.filter(q=>learned.has(q.id)));
+  state=start?"running":"ready";
+  fields.forEach(el=>el.hidden=true);
+  makeCoin();
+  hud();
+  draw();
 }
-function saveNotes(changedAction){
-if(changedAction)$("done").checked=false;
-updateTask();
-store.notes[noteKey()]={insight:$("insight").value,action:$("action").value,done:$("done").checked};save();
+function inside(point,rect){
+  return point.x>=rect.x&&point.x<rect.x+rect.w&&point.y>=rect.y&&point.y<rect.y+rect.h;
 }
-$("insight").addEventListener("input",()=>saveNotes(false));
-$("action").addEventListener("input",()=>saveNotes(true));
-$("done").addEventListener("change",()=>saveNotes(false));
-function resetSnake(){
-snake=Array.from({length},(_,i)=>({x:12-i,y:10}));
-dir={x:1,y:0};nextDir={x:1,y:0};accumulator=0;
+function placeFields(){
+  if(!active)return;
+  const h=Math.min(7,Math.max(3,Math.ceil(64/(height/ROWS))));
+  const head=snake[0];
+  let bestY=0,bestScore=Infinity;
+  for(let y=0;y<=ROWS-h;y++){
+    const rects=[{x:0,y,w:9,h},{x:11,y,w:9,h}];
+    if(rects.some(rect=>inside(head,rect)))continue;
+    let overlaps=0;
+    for(const p of snake)if(rects.some(rect=>inside(p,rect)))overlaps++;
+    const distance=head.y<y?y-head.y:head.y>=y+h?head.y-(y+h-1):0;
+    const score=overlaps*100-distance;
+    if(score<bestScore){bestScore=score;bestY=y}
+  }
+  active.rects=[{x:0,y:bestY,w:9,h},{x:11,y:bestY,w:9,h}];
+  fields.forEach((el,i)=>{
+    const rect=active.rects[i];
+    el.textContent=active.options[i].text;
+    el.style.left=(rect.x/COLS*100)+"%";
+    el.style.top=(rect.y/ROWS*100)+"%";
+    el.style.width=(rect.w/COLS*100)+"%";
+    el.style.height=(rect.h/ROWS*100)+"%";
+    el.hidden=false;
+  });
 }
-function eligible(){return questions().filter(q=>mode.value==="all"||record(q).level<2);}
-function showQuestion(){ $("question").textContent=current?current.q:"Alle Inhalte sicher – wähle „Alle Inhalte“ zum Wiederholen."; }
-function preview(){
-current=eligible()[0]||null;points=0;length=3;remaining=+duration.value;highlight=-1;resetSnake();showQuestion();updateScore();
-$("feedback").textContent=current?"Friss das richtige Antwortfeld. Kollisionen löschen keinen Lernfortschritt.":"Im gewählten Thema sind keine unsicheren Fragen mehr offen.";
+function ask(){
+  const question=queue.shift();
+  const options=[{text:question.correct,correct:true},{text:question.wrong,correct:false}];
+  if(Math.random()<.5)options.reverse();
+  active={question,options,rects:[]};
+  coin=null;
+  turns=[];
+  accumulator=0;
+  hud();
+  resize();
 }
-function updateTopic(){
-topic.replaceChildren();
-for(const [id,t] of Object.entries(catalog[ws.value].topics)){const o=document.createElement("option");o.value=id;o.textContent=t.name;topic.append(o);}
-changeSelection();
+function answer(index){
+  const question=active.question,correct=active.options[index].correct;
+  if(correct){
+    points+=10;
+    learned.add(question.id);
+  }
+  queue.push(question);
+  result={question,correct};
+  active=null;
+  state="feedback";
+  turns=[];
+  accumulator=0;
+  fields.forEach(el=>el.hidden=true);
+  save();
+  hud();
 }
-function changeSelection(){loadNotes();refreshProgress();preview();}
-ws.addEventListener("change",updateTopic);
-topic.addEventListener("change",changeSelection);
-mode.addEventListener("change",preview);
-duration.addEventListener("change",()=>{remaining=+duration.value;updateScore();});
-function updateScore(){
-const secs=Math.max(0,Math.ceil(remaining));
-$("score").textContent=`Punkte: ${points} · ${Math.floor(secs/60)}:${String(secs%60).padStart(2,"0")}`;
+function finish(text){
+  state="over";
+  endText=text;
+  accumulator=0;
+  turns=[];
+  active=null;
+  fields.forEach(el=>el.hidden=true);
+  save();
+  hud();
 }
-function lockSettings(locked){[ws,topic,duration,speed,mode].forEach(el=>el.disabled=locked);}
-function begin(){
-queue=eligible().slice().sort((a,b)=>record(a).level-record(b).level);
-if(!queue.length){$("feedback").textContent="Keine unsicheren Fragen offen. Wähle „Alle Inhalte“.";return;}
-active=true;phase="play";roundId=Date.now();points=0;length=3;remaining=+duration.value;endsAt=performance.now()+remaining*1000;
-lockSettings(true);start.textContent="Beenden";nextQuestion();
-$("feedback").textContent="Lenke die Schlange in das richtige Antwortfeld.";updateScore();
+function step(){
+  if(state!=="running")return;
+  if(turns.length)direction=turns.shift();
+  const head={x:snake[0].x+direction.x,y:snake[0].y+direction.y};
+  const takesCoin=coin&&head.x===coin.x&&head.y===coin.y;
+  const answerIndex=active?active.rects.findIndex(rect=>inside(head,rect)):-1;
+  const grows=!!takesCoin||(answerIndex>=0&&active.options[answerIndex].correct);
+  if(head.x<0||head.x>=COLS||head.y<0||head.y>=ROWS){
+    finish("Spielende · Wand berührt.");return;
+  }
+  const bodyLength=snake.length-(grows?0:1);
+  for(let i=0;i<bodyLength;i++){
+    if(snake[i].x===head.x&&snake[i].y===head.y){
+      finish("Spielende · eigenen Körper berührt.");return;
+    }
+  }
+  snake.unshift(head);
+  if(!grows)snake.pop();
+  if(answerIndex>=0){answer(answerIndex);return}
+  if(takesCoin){
+    points++;
+    count++;
+    save();
+    if(count===9)ask();
+    else{makeCoin();hud()}
+  }
 }
-function finish(message){
-active=false;phase="idle";accumulator=0;lockSettings(false);start.textContent="Wiederholen";
-$("feedback").textContent=message||"Runde beendet. Lernstand bleibt gespeichert – starte später eine Wiederholung.";
-refreshProgress();save();updateScore();
+function steer(name){
+  if(state!=="running"||turns.length>=2)return;
+  const next=vectors[name],previous=turns.length?turns[turns.length-1]:direction;
+  if(next.x===previous.x&&next.y===previous.y)return;
+  if(next.x===-previous.x&&next.y===-previous.y)return;
+  turns.push(next);
 }
-start.addEventListener("click",()=>active?finish():begin());
-function nextQuestion(){
-if(mode.value==="unsure")queue=queue.filter(q=>record(q).level<2);
-if(!queue.length){finish("Alle Inhalte sicher! Wähle „Alle Inhalte“, um weiter zu üben.");return;}
-current=queue.shift();highlight=-1;phase="play";resetSnake();showQuestion();
+function mainAction(){
+  if(state==="ready"||state==="over"){reset(true);return}
+  if(state==="running"){state="paused";accumulator=0}
+  else if(state==="paused"){state="running";accumulator=0}
+  else if(state==="feedback"){
+    state="running";
+    count=0;
+    result=null;
+    turns=[];
+    accumulator=0;
+    makeCoin();
+  }
+  hud();
+  draw();
 }
-function answer(index,now){
-const correct=index===current.c,r=record(current);
-if(correct){points+=10;length=Math.min(8,length+1);store.learn[current.id]={level:Math.min(2,r.level+(r.last!==roundId?1:0)),last:roundId};}
-else store.learn[current.id]={level:0,last:0};
-queue.push(current);
-highlight=index;phase="answer";holdUntil=now+2700;accumulator=0;
-if(correct){const tail=snake[snake.length-1];snake.push({x:tail.x,y:tail.y});}
-$("feedback").textContent=(correct?"Richtig! ":"Falsch. ")+"Lösung: "+current.a[current.c]+". "+current.e;
-refreshProgress();save();updateScore();
-}
-function turn(name){
-if(!active||phase!=="play")return;
-const v=vectors[name];if(v&&(v.x!==-dir.x||v.y!==-dir.y))nextDir={...v};
-}
-document.addEventListener("keydown",e=>{
-if(/^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(e.target.tagName))return;
-const map={ArrowLeft:"left",ArrowRight:"right",ArrowUp:"up",ArrowDown:"down"};
-if(map[e.key]){e.preventDefault();turn(map[e.key]);}
+$("main").addEventListener("click",mainAction);
+$("restart").addEventListener("click",()=>reset(true));
+controls.forEach(button=>{
+  button.addEventListener("pointerdown",event=>{
+    event.preventDefault();
+    steer(button.dataset.dir);
+  });
+  button.addEventListener("click",event=>{
+    if(event.detail===0)steer(button.dataset.dir);
+  });
 });
-document.querySelectorAll("[data-dir]").forEach(b=>{
-b.addEventListener("pointerdown",e=>{e.preventDefault();turn(b.dataset.dir);});
-b.addEventListener("click",e=>{if(e.detail===0)turn(b.dataset.dir);});
+const keyMap={ArrowLeft:"left",ArrowRight:"right",ArrowUp:"up",ArrowDown:"down",a:"left",d:"right",w:"up",s:"down"};
+document.addEventListener("keydown",event=>{
+  const key=event.key.length===1?event.key.toLowerCase():event.key;
+  if(keyMap[key]){
+    event.preventDefault();
+    if(!event.repeat)steer(keyMap[key]);
+  }
 });
-start.addEventListener("click",()=>start.blur());
-function step(now){
-dir={...nextDir};
-const head={x:snake[0].x+dir.x,y:snake[0].y+dir.y};
-const hit=snake.slice(0,-1).some(p=>p.x===head.x&&p.y===head.y);
-if(head.x<0||head.x>=cols||head.y<0||head.y>=rows||hit){
-resetSnake();phase="collision";holdUntil=now+850;
-$("feedback").textContent="Kollision – neuer Versuch. Punkte und Lernfortschritt bleiben erhalten.";return;
-}
-snake.unshift(head);snake.pop();
-const index=pads.findIndex(p=>head.x>=p.x&&head.x<p.x+p.w&&head.y>=p.y&&head.y<p.y+p.h);
-if(index>=0)answer(index,now);
-}
+document.addEventListener("visibilitychange",()=>{
+  if(document.hidden&&state==="running"){
+    state="paused";
+    accumulator=0;
+    hud();
+  }
+});
 function resize(){
-const r=canvas.getBoundingClientRect(),dpr=Math.min(2,window.devicePixelRatio||1);
-width=Math.max(1,r.width);height=Math.max(1,r.height);
-canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);
-ctx.setTransform(dpr,0,0,dpr,0,0);
-unit=Math.min(width/cols,height/rows);offsetX=(width-cols*unit)/2;offsetY=(height-rows*unit)/2;
-draw();
-}
-function wrap(text,maxWidth){
-const result=[];let line="";
-for(const word of text.split(" ")){
-if(line&&ctx.measureText(line+" "+word).width>maxWidth){result.push(line);line=word;}
-else line+=(line?" ":"")+word;
-}
-if(line)result.push(line);
-return result;
+  const rect=board.getBoundingClientRect();
+  width=Math.max(1,board.clientWidth);
+  height=Math.max(1,board.clientHeight);
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  canvas.width=Math.round(width*dpr);
+  canvas.height=Math.round(height*dpr);
+  ctx.setTransform(canvas.width/width,0,0,canvas.height/height,0,0);
+  placeFields();
+  draw();
 }
 function draw(){
-ctx.fillStyle="#162c37";ctx.fillRect(0,0,width,height);
-ctx.strokeStyle="#45616d";ctx.lineWidth=1;ctx.strokeRect(offsetX+.5,offsetY+.5,cols*unit-1,rows*unit-1);
-if(current){
-pads.forEach((p,i)=>{
-const x=offsetX+p.x*unit,y=offsetY+p.y*unit,w=p.w*unit,h=p.h*unit;
-ctx.fillStyle=highlight<0?"#e7eef1":i===current.c?"#abebc8":i===highlight?"#ffc1b8":"#e7eef1";
-ctx.fillRect(x+1,y+1,w-2,h-2);
-ctx.fillStyle="#132f3e";let font=Math.min(13,unit*.88);ctx.font="600 "+font+"px system-ui";
-const text=current.a[i];
-while(text.split(" ").some(s=>ctx.measureText(s).width>w-8)&&font>6){font-=.5;ctx.font="600 "+font+"px system-ui";}
-const lines=wrap(text,w-8);const lh=font+2;
-ctx.textAlign="center";ctx.textBaseline="middle";
-lines.forEach((line,j)=>ctx.fillText(line,x+w/2,y+h/2+(j-(lines.length-1)/2)*lh));
-});
+  const cw=width/COLS,ch=height/ROWS;
+  ctx.fillStyle="#122c23";
+  ctx.fillRect(0,0,width,height);
+  ctx.strokeStyle="#1c3b2f";
+  ctx.lineWidth=.6;
+  ctx.beginPath();
+  for(let x=1;x<COLS;x++){ctx.moveTo(x*cw,0);ctx.lineTo(x*cw,height)}
+  for(let y=1;y<ROWS;y++){ctx.moveTo(0,y*ch);ctx.lineTo(width,y*ch)}
+  ctx.stroke();
+  if(coin){
+    const x=(coin.x+.5)*cw,y=(coin.y+.5)*ch,r=Math.min(cw,ch)*.36;
+    ctx.beginPath();
+    ctx.arc(x,y,r,0,Math.PI*2);
+    ctx.fillStyle="#ffd15a";
+    ctx.fill();
+    ctx.fillStyle="#775118";
+    ctx.fillRect(x-r*.15,y-r*.55,Math.max(1,r*.3),r*1.1);
+  }
+  const gap=Math.max(1,Math.min(cw,ch)*.09);
+  for(let i=snake.length-1;i>=0;i--){
+    const p=snake[i];
+    ctx.fillStyle=i===0?"#c7f9b4":"#65bf85";
+    ctx.fillRect(p.x*cw+gap,p.y*ch+gap,cw-gap*2,ch-gap*2);
+  }
+  if(snake.length){
+    const head=snake[0],cx=(head.x+.5)*cw,cy=(head.y+.5)*ch;
+    const dot=Math.max(1.2,Math.min(cw,ch)*.09);
+    ctx.fillStyle="#153827";
+    for(const side of [-1,1]){
+      const x=cx+direction.x*cw*.22+(direction.y?side*cw*.19:0);
+      const y=cy+direction.y*ch*.22+(direction.x?side*ch*.19:0);
+      ctx.beginPath();ctx.arc(x,y,dot,0,Math.PI*2);ctx.fill();
+    }
+  }
 }
-snake.forEach((p,i)=>{
-ctx.fillStyle=i===0?"#fff0a0":"#62d6be";
-ctx.fillRect(offsetX+p.x*unit+1,offsetY+p.y*unit+1,Math.max(1,unit-2),Math.max(1,unit-2));
-});
-if(!active){
-ctx.font="600 "+Math.max(10,Math.min(14,unit))+"px system-ui";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillStyle="#fff";
-ctx.fillText("Mit „"+start.textContent+"“ spielen",width/2,offsetY+7.5*unit);
+function frame(time){
+  const delta=lastTime?Math.min(100,time-lastTime):0;
+  lastTime=time;
+  if(state==="running"){
+    accumulator+=delta;
+    let interval=active?420:165;
+    while(state==="running"&&accumulator>=interval){
+      accumulator-=interval;
+      step();
+      interval=active?420:165;
+    }
+  }else accumulator=0;
+  draw();
+  requestAnimationFrame(frame);
 }
-}
-function frame(now){
-const dt=lastTime?Math.min(250,now-lastTime):0;lastTime=now;
-if(active){
-remaining=Math.max(0,(endsAt-now)/1000);updateScore();
-if(remaining<=0){
-const lastAnswer=phase==="answer"?$("feedback").textContent+" Runde beendet.":"Runde beendet. Lernstand gespeichert – später erneut üben.";
-finish(lastAnswer);
-}else if(phase==="answer"||phase==="collision"){
-if(now>=holdUntil){if(phase==="answer")nextQuestion();else{phase="play";accumulator=0;}}
-}else if(phase==="play"){
-accumulator+=dt;const tick=+speed.value;
-while(accumulator>=tick&&active&&phase==="play"){accumulator-=tick;step(now);}
-}
-}
-draw();requestAnimationFrame(frame);
-}
-updateTopic();save();
-new ResizeObserver(resize).observe(canvas.parentElement);
+reset();
+resize();
+new ResizeObserver(resize).observe(board);
 window.addEventListener("resize",resize);
-resize();requestAnimationFrame(frame);
+requestAnimationFrame(frame);
 </script>
 </body>
 </html>
