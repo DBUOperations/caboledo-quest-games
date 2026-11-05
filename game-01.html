@@ -4,276 +4,279 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; font-src data:; media-src data: blob:; connect-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Bildungsurlaub-Pong</title>
+<title>Lern-Snake</title>
 <style>
-*{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden}
-body{background:#10151d;color:#edf5ef;font-family:ui-monospace,Consolas,monospace}
-main{width:100%;height:100dvh;min-width:0;min-height:0;display:flex;flex-direction:column;gap:10px;padding:14px}
-header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0}
-h1{font-size:clamp(15px,2.6vw,22px);margin:0;color:#83edb3}
-button{font:inherit;font-size:13px;background:#83edb3;color:#10151d;border:0;border-radius:3px;padding:9px 12px;cursor:pointer;flex-shrink:0}
-button:hover{background:#b0ffd2}
-button:focus-visible,canvas:focus-visible{outline:2px solid #ffc573;outline-offset:2px}
-.scoreboard{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;flex-shrink:0}
-.side{display:flex;align-items:center;gap:10px;font-size:12px;color:#83edb3;min-width:0}
-.side:last-child{justify-content:flex-end;text-align:right;color:#ffc573}
-.side span{line-height:1.4}
-.side strong{font-size:28px;line-height:1}
-.goal{font-size:11px;color:#9ba9b6;text-align:center}
-.field{position:relative;flex:1;min-height:0;min-width:0;border:1px solid #394657;background:#121b25}
-canvas{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;font-size:11px;line-height:1.4}
-#status{color:#ffc573}
-.hint{color:#9ba9b6;text-align:right}
-@media(max-width:440px){main{padding:9px;gap:8px}.side{font-size:10px;gap:7px}.side strong{font-size:25px}.goal{font-size:10px}footer{align-items:flex-start;gap:8px}.hint{max-width:130px}button{padding:8px;font-size:11px}}
-@media(max-height:380px){main{padding:8px;gap:6px}h1{font-size:16px}.side strong{font-size:24px}button{padding:7px 10px}.side span{line-height:1.2}}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}body{font:13px system-ui,sans-serif;background:#f3f5f7;color:#182b38}button,input,select,textarea{font:inherit;color:inherit}button,select,input,textarea{border:1px solid #aebbc5;border-radius:5px;background:white;min-width:0}button{cursor:pointer;padding:5px 10px}button:disabled{cursor:default;opacity:.55}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #08756b;outline-offset:1px}
+.app{width:100%;height:100dvh;padding:8px;display:flex;flex-direction:column;gap:7px;min-height:0;min-width:0}
+header{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:none}h1{font-size:18px;margin:0}#score{font-weight:600;font-variant-numeric:tabular-nums;font-size:12px}
+.settings{display:grid;grid-template-columns:1.15fr 1.1fr .7fr .85fr 1fr auto;gap:6px;align-items:end;flex:none}
+label{display:flex;flex-direction:column;gap:2px;font-size:11px;min-width:0}select,input{height:28px;padding:3px 5px;width:100%}.settings button{height:28px;background:#08756b;color:white;border-color:#08756b}
+main{display:grid;grid-template-columns:minmax(0,1fr) 196px;gap:8px;flex:1;min-height:0;min-width:0}
+.game{display:grid;grid-template-rows:32px minmax(0,1fr) 37px 28px;gap:4px;min-height:0;min-width:0}
+#question{margin:0;font-size:13px;line-height:16px;display:flex;align-items:center;font-weight:650}
+.field{min-height:0;min-width:0;background:#162c37;border-radius:5px;overflow:hidden}canvas{display:block;width:100%;height:100%}
+#feedback{font-size:12px;line-height:17px;margin:0;overflow:hidden}.steer{display:flex;align-items:center;justify-content:center;gap:6px}.steer button{padding:0;width:40px;height:28px;font-size:18px;touch-action:none}.steer span{font-size:10px;color:#526571;margin-left:4px}
+aside{display:flex;flex-direction:column;gap:7px;min-width:0;min-height:0;padding:8px;background:#fff;border:1px solid #d4dde3;border-radius:5px}
+.progress{font-size:11px;line-height:16px}.progress strong{font-size:12px}.small{font-size:10px;color:#536773;line-height:14px}.lists{margin-top:3px;font-size:10px;line-height:14px;overflow-wrap:anywhere}
+.notes{display:flex;flex-direction:column;gap:6px;min-height:0}textarea{resize:none;width:100%;height:37px;min-height:32px;padding:4px 5px}#action{font-size:12px}
+.done{display:flex;flex-direction:row;align-items:center;gap:5px;font-size:11px}.done input{width:15px;height:15px;margin:0;flex:none}#task{font-size:11px;line-height:15px}
+@media(max-width:520px){
+.app{padding:6px;gap:5px}.settings{grid-template-columns:1fr 1fr 1fr;gap:4px}.settings label{font-size:10px}.settings button{width:100%}main{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto;gap:5px}aside{display:grid;grid-template-columns:.95fr 1.2fr;gap:7px;padding:6px}.notes{gap:3px}.progress{line-height:14px}.lists{font-size:9px;line-height:12px}textarea{height:32px}#action{height:25px}.game{grid-template-rows:32px minmax(0,1fr) 35px 26px;gap:3px}.steer button{height:26px}.small{font-size:9px;line-height:12px}
+}
+@media(max-height:390px) and (min-width:521px){.app{padding:6px;gap:4px}aside{gap:4px;padding:6px}.notes{gap:4px}.game{grid-template-rows:29px minmax(0,1fr) 34px 26px;gap:3px}.steer button{height:26px}h1{font-size:16px}.lists{line-height:12px}textarea{height:32px}}
 </style>
 </head>
 <body>
+<div class="app">
+<header><h1>Lern-Snake</h1><div id="score">Punkte: 0 · 0:30</div></header>
+<div class="settings">
+<label>Workshop<select id="workshop"><option value="kommunikation">Kommunikation</option><option value="teamarbeit">Teamarbeit</option></select></label>
+<label>Thema<select id="topic"></select></label>
+<label>Rundendauer<select id="duration"><option value="30">30 Sek.</option><option value="60">1 Min.</option><option value="120">2 Min.</option></select></label>
+<label>Tempo<select id="speed"><option value="240">Langsam</option><option value="160" selected>Mittel</option><option value="100">Schnell</option></select></label>
+<label>Üben<select id="mode"><option value="all">Alle Inhalte</option><option value="unsure">Nur unsichere</option></select></label>
+<button id="start">Start</button>
+</div>
 <main>
-<header>
-<h1>Bildungsurlaub-Pong</h1>
-<button id="restart" type="button">Neustart</button>
-</header>
-<div class="scoreboard" aria-label="Punktestand">
-<div class="side"><span>DU<br>Lernzeit</span><strong id="you">0</strong></div>
-<div class="goal">Zuerst 7 Punkte</div>
-<div class="side"><strong id="computer">0</strong><span>COMPUTER<br>Büroalltag</span></div>
+<section class="game" aria-label="Snake-Lernspiel">
+<p id="question"></p>
+<div class="field"><canvas id="board" aria-label="Snake mit drei essbaren Antwortfeldern. Steuerung mit Pfeiltasten oder Pfeilknöpfen."></canvas></div>
+<p id="feedback" role="status" aria-live="polite"></p>
+<div class="steer" aria-label="Steuerung">
+<button type="button" data-dir="left" aria-label="Links">←</button>
+<button type="button" data-dir="up" aria-label="Oben">↑</button>
+<button type="button" data-dir="down" aria-label="Unten">↓</button>
+<button type="button" data-dir="right" aria-label="Rechts">→</button>
+<span>Pfeiltasten / Tippen</span>
 </div>
-<div class="field">
-<canvas id="court" tabindex="0" aria-label="Pong-Spielfeld. Linken Schläger mit Maus, Touch oder Pfeiltasten bewegen."></canvas>
+</section>
+<aside>
+<div class="progress">
+<strong>Lernfortschritt</strong>
+<div id="counts"></div>
+<div class="small">Sicher: richtig in zwei verschiedenen Runden.</div>
+<div id="lists" class="lists"></div>
+<div id="saved" class="small"></div>
 </div>
-<footer>
-<span id="status" role="status" aria-live="polite">Bereit für deine Lernzeit?</span>
-<span class="hint">Maus / Touch · ↑ ↓</span>
-</footer>
+<div class="notes">
+<label>Meine Erkenntnis<textarea id="insight" maxlength="240" placeholder="Das nehme ich mit …"></textarea></label>
+<label>Maßnahme im Arbeitsalltag<input id="action" maxlength="120" placeholder="Was tue ich bis wann?"></label>
+<label class="done"><input type="checkbox" id="done">Maßnahme erledigt</label>
+<div id="task"></div>
+</div>
+</aside>
 </main>
+</div>
 <script>
-(() => {
-'use strict';
-const canvas = document.getElementById('court');
-const ctx = canvas.getContext('2d');
-const scoreYou = document.getElementById('you');
-const scoreComputer = document.getElementById('computer');
-const status = document.getElementById('status');
-let W = 0, H = 0, paddleH = 60, paddleW = 10, inset = 16, radius = 5, base = 300;
-let leftY = 0, rightY = 0, target = 0;
-let x = 0, y = 0, vx = 0, vy = 0;
-let you = 0, computer = 0, finished = false, wait = .8, serveDirection = 1;
-let aiOffset = 0, aiTimer = 0;
-const keys = {up:false, down:false};
-const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
-const limitY = value => clamp(value, paddleH / 2, H - paddleH / 2);
-
-function resize() {
-  const rect = canvas.getBoundingClientRect();
-  const oldW = W || rect.width, oldH = H || rect.height;
-  W = Math.max(1, rect.width);
-  H = Math.max(1, rect.height);
-  const ratio = Math.min(window.devicePixelRatio || 1, 2);
-  canvas.width = Math.round(W * ratio);
-  canvas.height = Math.round(H * ratio);
-  ctx.setTransform(canvas.width / W, 0, 0, canvas.height / H, 0, 0);
-  const oldBase = base;
-  base = clamp(W * .47, 190, 390);
-  paddleH = Math.min(H * .25, clamp(H * .22, 42, 88));
-  paddleW = W < 420 ? 8 : 11;
-  inset = W < 420 ? 12 : 20;
-  radius = W < 420 ? 4 : 5;
-  x = clamp(x * W / oldW, radius, W - radius);
-  y = clamp(y * H / oldH, radius, H - radius);
-  leftY = limitY(leftY * H / oldH);
-  rightY = limitY(rightY * H / oldH);
-  target = limitY(target * H / oldH);
-  vx *= base / oldBase;
-  vy *= base / oldBase;
-  if (wait > 0) { x = W / 2; y = H / 2; }
+const catalog={
+kommunikation:{name:"Kommunikation",topics:{
+feedback:{name:"Feedback",questions:[
+{id:"f1",tag:"Beobachtung",q:"Womit beginnt hilfreiches Feedback?",a:["Beobachtung","Vorwurf","Ratschlag"],c:0,e:"Beschreibe zuerst konkret, was du beobachtet hast."},
+{id:"f2",tag:"Ich-Botschaft",q:"Welche Formulierung ist eine Ich-Botschaft?",a:["Du störst!","Ich bin irritiert","Du bist unfair"],c:1,e:"Ich-Botschaften benennen das eigene Erleben statt zu urteilen."},
+{id:"f3",tag:"Bitte",q:"Wie wird aus Feedback ein nächster Schritt?",a:["Druck machen","Schweigen","Konkrete Bitte"],c:2,e:"Eine konkrete Bitte macht die gewünschte Veränderung umsetzbar."}
+]},
+zuhoeren:{name:"Zuhören",questions:[
+{id:"z1",tag:"Paraphrase",q:"Was bedeutet Paraphrasieren?",a:["Widersprechen","Zusammenfassen","Unterbrechen"],c:1,e:"Gib das Gehörte in eigenen Worten wieder."},
+{id:"z2",tag:"Offene Frage",q:"Welche Frage lädt zum Erzählen ein?",a:["Alles klar?","War es gut?","Was war wichtig?"],c:2,e:"Offene Fragen lassen Raum für eine ausführliche Antwort."},
+{id:"z3",tag:"Verstehen",q:"Was hilft, Missverständnisse zu klären?",a:["Nachfragen","Vermuten","Thema wechseln"],c:0,e:"Prüfe dein Verständnis durch gezieltes Nachfragen."}
+]}
+}},
+teamarbeit:{name:"Teamarbeit",topics:{
+prioritaeten:{name:"Prioritäten",questions:[
+{id:"p1",tag:"Wichtig",q:"Eine wichtige, nicht dringende Aufgabe sollte man …",a:["Ignorieren","Einplanen","Sofort stoppen"],c:1,e:"Plane wichtige Aufgaben ein, bevor sie dringend werden."},
+{id:"p2",tag:"Fokus",q:"Was unterstützt konzentrierte Arbeit?",a:["Multitasking","Ständig chatten","Fokuszeit"],c:2,e:"Geschützte Fokuszeit reduziert Unterbrechungen."},
+{id:"p3",tag:"Nächster Schritt",q:"Wie wird eine große Aufgabe handhabbar?",a:["Kleiner Schritt","Mehr abwarten","Alles zugleich"],c:0,e:"Definiere einen kleinen, konkret ausführbaren nächsten Schritt."}
+]},
+zusammenarbeit:{name:"Zusammenarbeit",questions:[
+{id:"t1",tag:"Verantwortung",q:"Was braucht eine verlässlich verteilte Aufgabe?",a:["Viele Kopien","Klare Zuständigkeit","Nur eine Idee"],c:1,e:"Eine klar benannte Person übernimmt die Verantwortung."},
+{id:"t2",tag:"Retrospektive",q:"Wozu dient eine Retrospektive?",a:["Schuld suchen","Status vorlesen","Verbessern"],c:2,e:"Das Team reflektiert die Zusammenarbeit und vereinbart Verbesserungen."},
+{id:"t3",tag:"Fertig",q:"Was hilft beim gemeinsamen Verständnis von „fertig“?",a:["Klare Kriterien","Ein gutes Gefühl","Zeitdruck"],c:0,e:"Gemeinsame Fertig-Kriterien machen Ergebnisse überprüfbar."}
+]}
+}}
+};
+const $=id=>document.getElementById(id);
+const ws=$("workshop"),topic=$("topic"),duration=$("duration"),speed=$("speed"),mode=$("mode"),start=$("start");
+const canvas=$("board"),ctx=canvas.getContext("2d");
+const key="lernsnake-frame-b-v1";
+let store={learn:{},notes:{}},persistent=true;
+try{const data=JSON.parse(localStorage.getItem(key));if(data&&data.learn&&data.notes)store=data;}catch(e){persistent=false;}
+let active=false,phase="idle",roundId=0,points=0,length=3,snake=[],dir={x:1,y:0},nextDir={x:1,y:0};
+let queue=[],current=null,remaining=30,endsAt=0,holdUntil=0,accumulator=0,lastTime=0;
+let width=1,height=1,unit=1,offsetX=0,offsetY=0,highlight=-1;
+const cols=24,rows=12;
+const pads=[{x:1,y:2,w:7,h:3},{x:9,y:2,w:7,h:3},{x:17,y:2,w:6,h:3}];
+const vectors={left:{x:-1,y:0},right:{x:1,y:0},up:{x:0,y:-1},down:{x:0,y:1}};
+function questions(){return catalog[ws.value].topics[topic.value].questions;}
+function noteKey(){return ws.value+"/"+topic.value;}
+function record(q){return store.learn[q.id]||{level:0,last:0};}
+function save(){try{localStorage.setItem(key,JSON.stringify(store));persistent=true;}catch(e){persistent=false;}$("saved").textContent=persistent?"Automatisch lokal gespeichert":"Speicherung nur in dieser Sitzung";}
+function refreshProgress(){
+const qs=questions(),right=qs.filter(q=>record(q).level>0),secure=qs.filter(q=>record(q).level>=2),practice=qs.filter(q=>record(q).level<2);
+$("counts").textContent=`Richtig: ${right.length}/${qs.length} · Sicher: ${secure.length}/${qs.length}`;
+$("lists").replaceChildren();
+for(const [label,items] of [["Richtig",right],["Weiter üben",practice]]){
+const line=document.createElement("div");line.textContent=label+": "+(items.map(q=>q.tag).join(", ")||"–");$("lists").append(line);
 }
-
-function reset() {
-  you = 0;
-  computer = 0;
-  scoreYou.textContent = '0';
-  scoreComputer.textContent = '0';
-  finished = false;
-  keys.up = keys.down = false;
-  leftY = rightY = target = H / 2;
-  x = W / 2;
-  y = H / 2;
-  vx = vy = 0;
-  wait = .85;
-  serveDirection = Math.random() < .5 ? -1 : 1;
-  aiTimer = 0;
-  aiOffset = 0;
-  status.textContent = 'Anstoß · Hol dir deine Lernzeit!';
 }
-
-function serve() {
-  x = W / 2;
-  y = H / 2;
-  const angle = (Math.random() < .5 ? -1 : 1) * (.2 + Math.random() * .3);
-  vx = serveDirection * base * Math.cos(angle);
-  vy = base * Math.sin(angle);
-  aiTimer = 0;
-  status.textContent = 'Match läuft · Bis 7 Punkte';
+function loadNotes(){
+const n=store.notes[noteKey()]||{};
+$("insight").value=n.insight||"";$("action").value=n.action||"";$("done").checked=!!n.done;updateTask();
 }
-
-function point(player) {
-  if (player) {
-    you++;
-    scoreYou.textContent = String(you);
-  } else {
-    computer++;
-    scoreComputer.textContent = String(computer);
-  }
-  vx = vy = 0;
-  x = W / 2;
-  y = H / 2;
-  if (you === 7 || computer === 7) {
-    finished = true;
-    wait = 0;
-    status.textContent = you === 7 ? 'Gewonnen! Zeit für Bildungsurlaub.' : 'Verloren · Noch ein Match?';
-  } else {
-    serveDirection = player ? 1 : -1;
-    wait = .8;
-    status.textContent = player ? 'Punkt für deine Lernzeit!' : 'Punkt für den Büroalltag.';
-  }
+function updateTask(){
+const exists=$("action").value.trim().length>0;
+$("done").disabled=!exists;
+if(!exists)$("done").checked=false;
+$("task").textContent=`Dashboard: ${exists&&$("done").checked?1:0}/${exists?1:0} Aufgaben erledigt`+($("insight").value.trim()?" · Erkenntnis notiert":"");
 }
-
-function hit(left) {
-  const center = left ? leftY : rightY;
-  const offset = clamp((y - center) / (paddleH / 2), -1, 1);
-  const angle = offset * 1.02;
-  const speed = Math.min(Math.hypot(vx, vy) * 1.065, base * 2);
-  vx = (left ? 1 : -1) * speed * Math.cos(angle);
-  vy = speed * Math.sin(angle);
-  x = left ? inset + paddleW + radius + .05 : W - inset - paddleW - radius - .05;
+function saveNotes(changedAction){
+if(changedAction)$("done").checked=false;
+updateTask();
+store.notes[noteKey()]={insight:$("insight").value,action:$("action").value,done:$("done").checked};save();
 }
-
-function update(dt) {
-  if (finished) return;
-  if (keys.up || keys.down) {
-    leftY = limitY(leftY + ((keys.down ? 1 : 0) - (keys.up ? 1 : 0)) * Math.max(H * 1.35, base * 1.4) * dt);
-    target = leftY;
-  } else {
-    const distance = target - leftY;
-    const step = Math.max(H * 2.8, base * 2) * dt;
-    leftY = limitY(leftY + clamp(distance, -step, step));
-  }
-
-  aiTimer -= dt;
-  if (aiTimer <= 0) {
-    aiTimer = .16;
-    aiOffset = (Math.random() - .5) * paddleH * .65;
-  }
-  const aim = vx > 0 ? y + aiOffset : H / 2;
-  const aiSpeed = Math.max(base * .76, H * .48);
-  rightY = limitY(rightY + clamp(aim - rightY, -aiSpeed * dt, aiSpeed * dt));
-
-  if (wait > 0) {
-    wait -= dt;
-    if (wait <= 0) serve();
-    return;
-  }
-
-  x += vx * dt;
-  y += vy * dt;
-  if (y - radius <= 0 && vy < 0) {
-    y = radius;
-    vy = Math.abs(vy);
-  } else if (y + radius >= H && vy > 0) {
-    y = H - radius;
-    vy = -Math.abs(vy);
-  }
-
-  const leftFace = inset + paddleW;
-  const rightFace = W - inset - paddleW;
-  if (vx < 0 && x - radius <= leftFace && x >= inset &&
-      y + radius >= leftY - paddleH / 2 && y - radius <= leftY + paddleH / 2) {
-    hit(true);
-  } else if (vx > 0 && x + radius >= rightFace && x <= W - inset &&
-      y + radius >= rightY - paddleH / 2 && y - radius <= rightY + paddleH / 2) {
-    hit(false);
-  }
-
-  if (x + radius < 0) point(false);
-  else if (x - radius > W) point(true);
+$("insight").addEventListener("input",()=>saveNotes(false));
+$("action").addEventListener("input",()=>saveNotes(true));
+$("done").addEventListener("change",()=>saveNotes(false));
+function resetSnake(){
+snake=Array.from({length},(_,i)=>({x:12-i,y:10}));
+dir={x:1,y:0};nextDir={x:1,y:0};accumulator=0;
 }
-
-function draw() {
-  ctx.clearRect(0, 0, W, H);
-  ctx.strokeStyle = '#344251';
-  ctx.lineWidth = 2;
-  ctx.setLineDash([6, 9]);
-  ctx.beginPath();
-  ctx.moveTo(W / 2, 0);
-  ctx.lineTo(W / 2, H);
-  ctx.stroke();
-  ctx.setLineDash([]);
-  ctx.fillStyle = '#83edb3';
-  ctx.fillRect(inset, leftY - paddleH / 2, paddleW, paddleH);
-  ctx.fillStyle = '#ffc573';
-  ctx.fillRect(W - inset - paddleW, rightY - paddleH / 2, paddleW, paddleH);
-  if (!finished) {
-    ctx.fillStyle = '#f4f7ee';
-    ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
-  } else {
-    const size = clamp(W * .045, 16, 30);
-    ctx.font = 'bold ' + size + 'px monospace';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    const title = you === 7 ? 'GEWONNEN!' : 'MATCH VERLOREN';
-    const textWidth = ctx.measureText(title).width;
-    ctx.fillStyle = '#121b25';
-    ctx.fillRect(W / 2 - textWidth / 2 - 12, H / 2 - size, textWidth + 24, size * 2);
-    ctx.fillStyle = you === 7 ? '#83edb3' : '#ffc573';
-    ctx.fillText(title, W / 2, H / 2);
-  }
+function eligible(){return questions().filter(q=>mode.value==="all"||record(q).level<2);}
+function showQuestion(){ $("question").textContent=current?current.q:"Alle Inhalte sicher – wähle „Alle Inhalte“ zum Wiederholen."; }
+function preview(){
+current=eligible()[0]||null;points=0;length=3;remaining=+duration.value;highlight=-1;resetSnake();showQuestion();updateScore();
+$("feedback").textContent=current?"Friss das richtige Antwortfeld. Kollisionen löschen keinen Lernfortschritt.":"Im gewählten Thema sind keine unsicheren Fragen mehr offen.";
 }
-
-function pointer(event) {
-  const rect = canvas.getBoundingClientRect();
-  target = limitY((event.clientY - rect.top) * H / rect.height);
+function updateTopic(){
+topic.replaceChildren();
+for(const [id,t] of Object.entries(catalog[ws.value].topics)){const o=document.createElement("option");o.value=id;o.textContent=t.name;topic.append(o);}
+changeSelection();
 }
-canvas.addEventListener('pointerdown', event => {
-  event.preventDefault();
-  canvas.focus({preventScroll:true});
-  canvas.setPointerCapture(event.pointerId);
-  pointer(event);
+function changeSelection(){loadNotes();refreshProgress();preview();}
+ws.addEventListener("change",updateTopic);
+topic.addEventListener("change",changeSelection);
+mode.addEventListener("change",preview);
+duration.addEventListener("change",()=>{remaining=+duration.value;updateScore();});
+function updateScore(){
+const secs=Math.max(0,Math.ceil(remaining));
+$("score").textContent=`Punkte: ${points} · ${Math.floor(secs/60)}:${String(secs%60).padStart(2,"0")}`;
+}
+function lockSettings(locked){[ws,topic,duration,speed,mode].forEach(el=>el.disabled=locked);}
+function begin(){
+queue=eligible().slice().sort((a,b)=>record(a).level-record(b).level);
+if(!queue.length){$("feedback").textContent="Keine unsicheren Fragen offen. Wähle „Alle Inhalte“.";return;}
+active=true;phase="play";roundId=Date.now();points=0;length=3;remaining=+duration.value;endsAt=performance.now()+remaining*1000;
+lockSettings(true);start.textContent="Beenden";nextQuestion();
+$("feedback").textContent="Lenke die Schlange in das richtige Antwortfeld.";updateScore();
+}
+function finish(message){
+active=false;phase="idle";accumulator=0;lockSettings(false);start.textContent="Wiederholen";
+$("feedback").textContent=message||"Runde beendet. Lernstand bleibt gespeichert – starte später eine Wiederholung.";
+refreshProgress();save();updateScore();
+}
+start.addEventListener("click",()=>active?finish():begin());
+function nextQuestion(){
+if(mode.value==="unsure")queue=queue.filter(q=>record(q).level<2);
+if(!queue.length){finish("Alle Inhalte sicher! Wähle „Alle Inhalte“, um weiter zu üben.");return;}
+current=queue.shift();highlight=-1;phase="play";resetSnake();showQuestion();
+}
+function answer(index,now){
+const correct=index===current.c,r=record(current);
+if(correct){points+=10;length=Math.min(8,length+1);store.learn[current.id]={level:Math.min(2,r.level+(r.last!==roundId?1:0)),last:roundId};}
+else store.learn[current.id]={level:0,last:0};
+queue.push(current);
+highlight=index;phase="answer";holdUntil=now+2700;accumulator=0;
+if(correct){const tail=snake[snake.length-1];snake.push({x:tail.x,y:tail.y});}
+$("feedback").textContent=(correct?"Richtig! ":"Falsch. ")+"Lösung: "+current.a[current.c]+". "+current.e;
+refreshProgress();save();updateScore();
+}
+function turn(name){
+if(!active||phase!=="play")return;
+const v=vectors[name];if(v&&(v.x!==-dir.x||v.y!==-dir.y))nextDir={...v};
+}
+document.addEventListener("keydown",e=>{
+if(/^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(e.target.tagName))return;
+const map={ArrowLeft:"left",ArrowRight:"right",ArrowUp:"up",ArrowDown:"down"};
+if(map[e.key]){e.preventDefault();turn(map[e.key]);}
 });
-canvas.addEventListener('pointermove', pointer);
-window.addEventListener('keydown', event => {
-  if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-    event.preventDefault();
-    keys[event.key === 'ArrowUp' ? 'up' : 'down'] = true;
-  }
+document.querySelectorAll("[data-dir]").forEach(b=>{
+b.addEventListener("pointerdown",e=>{e.preventDefault();turn(b.dataset.dir);});
+b.addEventListener("click",e=>{if(e.detail===0)turn(b.dataset.dir);});
 });
-window.addEventListener('keyup', event => {
-  if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-    event.preventDefault();
-    keys[event.key === 'ArrowUp' ? 'up' : 'down'] = false;
-  }
-});
-window.addEventListener('blur', () => { keys.up = keys.down = false; });
-document.getElementById('restart').addEventListener('click', reset);
-window.addEventListener('resize', resize);
-resize();
-reset();
-let last = 0;
-function frame(now) {
-  let remaining = last ? Math.min((now - last) / 1000, .04) : 0;
-  last = now;
-  while (remaining > 0) {
-    const step = Math.min(remaining, 1 / 240);
-    update(step);
-    remaining -= step;
-  }
-  draw();
-  requestAnimationFrame(frame);
+start.addEventListener("click",()=>start.blur());
+function step(now){
+dir={...nextDir};
+const head={x:snake[0].x+dir.x,y:snake[0].y+dir.y};
+const hit=snake.slice(0,-1).some(p=>p.x===head.x&&p.y===head.y);
+if(head.x<0||head.x>=cols||head.y<0||head.y>=rows||hit){
+resetSnake();phase="collision";holdUntil=now+850;
+$("feedback").textContent="Kollision – neuer Versuch. Punkte und Lernfortschritt bleiben erhalten.";return;
 }
-requestAnimationFrame(frame);
-})();
+snake.unshift(head);snake.pop();
+const index=pads.findIndex(p=>head.x>=p.x&&head.x<p.x+p.w&&head.y>=p.y&&head.y<p.y+p.h);
+if(index>=0)answer(index,now);
+}
+function resize(){
+const r=canvas.getBoundingClientRect(),dpr=Math.min(2,window.devicePixelRatio||1);
+width=Math.max(1,r.width);height=Math.max(1,r.height);
+canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);
+ctx.setTransform(dpr,0,0,dpr,0,0);
+unit=Math.min(width/cols,height/rows);offsetX=(width-cols*unit)/2;offsetY=(height-rows*unit)/2;
+draw();
+}
+function wrap(text,maxWidth){
+const result=[];let line="";
+for(const word of text.split(" ")){
+if(line&&ctx.measureText(line+" "+word).width>maxWidth){result.push(line);line=word;}
+else line+=(line?" ":"")+word;
+}
+if(line)result.push(line);
+return result;
+}
+function draw(){
+ctx.fillStyle="#162c37";ctx.fillRect(0,0,width,height);
+ctx.strokeStyle="#45616d";ctx.lineWidth=1;ctx.strokeRect(offsetX+.5,offsetY+.5,cols*unit-1,rows*unit-1);
+if(current){
+pads.forEach((p,i)=>{
+const x=offsetX+p.x*unit,y=offsetY+p.y*unit,w=p.w*unit,h=p.h*unit;
+ctx.fillStyle=highlight<0?"#e7eef1":i===current.c?"#abebc8":i===highlight?"#ffc1b8":"#e7eef1";
+ctx.fillRect(x+1,y+1,w-2,h-2);
+ctx.fillStyle="#132f3e";let font=Math.min(13,unit*.88);ctx.font="600 "+font+"px system-ui";
+const text=current.a[i];
+while(text.split(" ").some(s=>ctx.measureText(s).width>w-8)&&font>6){font-=.5;ctx.font="600 "+font+"px system-ui";}
+const lines=wrap(text,w-8);const lh=font+2;
+ctx.textAlign="center";ctx.textBaseline="middle";
+lines.forEach((line,j)=>ctx.fillText(line,x+w/2,y+h/2+(j-(lines.length-1)/2)*lh));
+});
+}
+snake.forEach((p,i)=>{
+ctx.fillStyle=i===0?"#fff0a0":"#62d6be";
+ctx.fillRect(offsetX+p.x*unit+1,offsetY+p.y*unit+1,Math.max(1,unit-2),Math.max(1,unit-2));
+});
+if(!active){
+ctx.font="600 "+Math.max(10,Math.min(14,unit))+"px system-ui";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillStyle="#fff";
+ctx.fillText("Mit „"+start.textContent+"“ spielen",width/2,offsetY+7.5*unit);
+}
+}
+function frame(now){
+const dt=lastTime?Math.min(250,now-lastTime):0;lastTime=now;
+if(active){
+remaining=Math.max(0,(endsAt-now)/1000);updateScore();
+if(remaining<=0){
+const lastAnswer=phase==="answer"?$("feedback").textContent+" Runde beendet.":"Runde beendet. Lernstand gespeichert – später erneut üben.";
+finish(lastAnswer);
+}else if(phase==="answer"||phase==="collision"){
+if(now>=holdUntil){if(phase==="answer")nextQuestion();else{phase="play";accumulator=0;}}
+}else if(phase==="play"){
+accumulator+=dt;const tick=+speed.value;
+while(accumulator>=tick&&active&&phase==="play"){accumulator-=tick;step(now);}
+}
+}
+draw();requestAnimationFrame(frame);
+}
+updateTopic();save();
+new ResizeObserver(resize).observe(canvas.parentElement);
+window.addEventListener("resize",resize);
+resize();requestAnimationFrame(frame);
 </script>
 </body>
 </html>
