@@ -3,424 +3,284 @@
 <head>
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; font-src data:; media-src data: blob:; connect-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Bildungsurlaub Pong</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
-:root{
-  --bg:#0a0f1f;--panel:#10182d;--panel2:#0d1430;--fg:#dff7ff;--muted:#8fb3c7;
-  --accent:#30f2c2;--accent2:#ff4db8;--accent3:#ffe66d;--line:#21446d;--danger:#ff6b6b;
-}
-*{box-sizing:border-box}
-html,body{height:100%;margin:0;background:radial-gradient(circle at 50% 20%,#16264d 0,#0a0f1f 55%,#060911 100%);color:var(--fg);font:500 clamp(12px,1.8vw,15px)/1.25 system-ui,Segoe UI,Arial,sans-serif;overflow:hidden}
-body{display:flex;align-items:stretch;justify-content:center}
-#app{width:min(100vw,900px);height:min(100vh,500px);display:flex;flex-direction:column;padding:8px;gap:8px}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;background:linear-gradient(180deg,#132142,#0c1430);border:1px solid var(--line);border-radius:12px;padding:7px 10px;box-shadow:0 0 0 1px #0a1229 inset}
-.brand{display:flex;align-items:center;gap:8px;min-width:0}
-.logo{font-size:clamp(18px,2.4vw,24px);filter:drop-shadow(0 0 6px rgba(48,242,194,.35))}
-h1{margin:0;font-size:clamp(14px,2.2vw,20px);letter-spacing:.08em;text-transform:uppercase;color:var(--accent3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sub{color:var(--muted);font-size:clamp(10px,1.6vw,12px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.controls{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-button,.seg label{
-  border:1px solid #365887;background:linear-gradient(180deg,#18284d,#101a35);color:var(--fg);
-  border-radius:10px;padding:7px 10px;font:inherit;cursor:pointer;transition:.12s transform,.15s background,.15s border-color,.15s box-shadow;
-  box-shadow:0 0 0 1px rgba(255,255,255,.03) inset;
-}
-button:hover,.seg label:hover{border-color:#5ea6ff}
-button:active,.seg label:active{transform:translateY(1px)}
-button.primary{background:linear-gradient(180deg,#163d48,#10242d);border-color:#3db89d;color:#ddfff6}
-button.accent{background:linear-gradient(180deg,#3e1941,#2a1131);border-color:#d868b7}
-button.warn{background:linear-gradient(180deg,#3d3220,#2a2114);border-color:#caa44f}
-button.small{padding:5px 8px;font-size:.95em}
-.screen{flex:1;min-height:0;display:none;position:relative;background:linear-gradient(180deg,rgba(19,30,58,.78),rgba(10,15,31,.9));border:1px solid var(--line);border-radius:14px;overflow:hidden}
-.screen.active{display:flex}
-#start,#end{padding:10px;align-items:center;justify-content:center}
-.panel{
-  width:min(100%,780px);max-height:100%;display:grid;grid-template-columns:1.12fr .88fr;gap:10px;align-items:stretch
-}
-.card,.aside{
-  background:linear-gradient(180deg,rgba(16,24,45,.95),rgba(10,15,31,.96));
-  border:1px solid var(--line);border-radius:14px;padding:12px;position:relative;overflow:hidden
-}
-.card:before,.aside:before{
-  content:"";position:absolute;inset:0;background:
-  linear-gradient(transparent 96%,rgba(255,255,255,.03) 100%),
-  repeating-linear-gradient(180deg,rgba(255,255,255,.025) 0 1px,transparent 1px 6px);
-  pointer-events:none
-}
-h2{margin:0 0 8px;font-size:clamp(16px,2.5vw,24px);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
-p{margin:6px 0;color:#d7edf7}
-.small{font-size:.95em;color:var(--muted)}
-.icons{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 4px}
-.icon{padding:7px 9px;border:1px solid #314f7b;border-radius:10px;background:#0d1732;color:#ccecf5}
-.seg{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
-.seg input{display:none}
-.seg input:checked+label{border-color:var(--accent);box-shadow:0 0 0 1px rgba(48,242,194,.3) inset,0 0 12px rgba(48,242,194,.2);color:#eafff9}
-.cta{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.list{display:grid;gap:7px}
-.item{display:flex;align-items:flex-start;gap:8px;padding:7px 8px;border:1px solid #263c63;border-radius:10px;background:#0b1430}
-.item b{color:var(--accent3)}
-#game{display:flex;flex-direction:column;padding:8px;gap:6px}
-.gamebar{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:36px}
-.status{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.score{font-size:clamp(16px,2.8vw,24px);font-weight:800;letter-spacing:.08em;color:var(--accent3);text-shadow:0 0 10px rgba(255,230,109,.25)}
-.badge{padding:4px 8px;border:1px solid #32557f;border-radius:999px;background:#0d1631;color:var(--muted);font-size:.92em}
-#wrap{flex:1;min-height:0;position:relative;border:1px solid #23466c;border-radius:12px;overflow:hidden;background:
-radial-gradient(circle at 50% 50%,rgba(35,68,109,.15),transparent 45%),
-linear-gradient(180deg,#0b1430,#091123)}
-canvas{display:block;width:100%;height:100%;touch-action:none}
-.overlay{
-  position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(5,8,18,.72);backdrop-filter:blur(2px)
-}
-.overlay.show{display:flex}
-.modal{
-  width:min(92%,360px);background:linear-gradient(180deg,#121e3c,#0a1228);border:1px solid #3b6294;border-radius:14px;padding:14px;text-align:center;
-  box-shadow:0 0 20px rgba(0,0,0,.35)
-}
-.modal h3{margin:0 0 6px;font-size:clamp(15px,2.2vw,20px);text-transform:uppercase;color:var(--accent)}
-.modal p{margin:0 0 10px;color:var(--muted)}
-.modal .cta{justify-content:center}
-.endbox{width:min(100%,620px);text-align:center}
-.big{font-size:clamp(34px,9vw,68px);line-height:1;margin:6px 0;color:var(--accent3);text-shadow:0 0 18px rgba(255,230,109,.25)}
-.win{color:var(--accent)}
-.lose{color:var(--danger)}
-.arc{display:flex;justify-content:center;gap:12px;font-size:clamp(24px,6vw,46px);margin:4px 0 8px}
-.help{color:var(--muted);font-size:.92em}
-.scan:after{
-  content:"";position:absolute;left:0;right:0;top:-20%;height:20%;background:linear-gradient(180deg,transparent,rgba(48,242,194,.06),transparent);
-  animation:scan 4.2s linear infinite;pointer-events:none
-}
-@keyframes scan{to{transform:translateY(600%)}}
+html,body{height:100%;margin:0;padding:0;}
+body{box-sizing:border-box;min-width:0;min-height:0;width:100vw;height:100dvh;display:flex;flex-direction:column;justify-content:center;align-items:center;background:#181e2a;}
+#pong-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100dvh;min-width:0;min-height:0;}
+#ui{display:flex;gap:12px;align-items:center;margin-bottom:8px;}
+#score{font:700 1.2rem monospace;color:#fff;letter-spacing:2px;}
+#diff{font:400 1rem sans-serif;}
+button,select{font:inherit;padding:2px 8px;border-radius:4px;border:none;background:#2c3550;color:#fff;cursor:pointer;}
+button:active{background:#3a4470;}
+#canvas{background:#232b3a;border-radius:12px;box-shadow:0 0 16px #0006;display:block;touch-action:none;}
+#overlay{position:absolute;top:0;left:0;width:100%;height:100dvh;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:2;background:rgba(24,30,42,0.92);color:#fff;font-family:sans-serif;transition:opacity .2s;}
+#overlay h2{font-size:2rem;margin:0 0 12px;}
+#overlay button{margin-top:16px;}
 @media (max-width:700px){
-  .panel{grid-template-columns:1fr}
-  .aside{display:none}
-  .topbar{padding:6px 8px}
+  #canvas{width:98vw !important;height:56vw !important;max-width:100vw;max-height:60dvh;}
 }
 </style>
 </head>
 <body>
-<div id="app">
-  <div class="topbar">
-    <div class="brand">
-      <div class="logo">🏓</div>
-      <div>
-        <h1>Bildungsurlaub Pong</h1>
-        <div class="sub">Retro-Arcade: Lerne, blocke, punkte.</div>
-      </div>
-    </div>
-    <div class="controls">
-      <button id="homeBtn" class="small">↺ Start</button>
-      <button id="pauseBtn" class="small">⏸ Pause</button>
-    </div>
+<div id="pong-wrap">
+  <div id="ui">
+    <span id="score">0 : 0</span>
+    <label id="diff">Schwierigkeit:
+      <select id="difficulty">
+        <option value="easy">Leicht</option>
+        <option value="medium" selected>Mittel</option>
+        <option value="hard">Schwer</option>
+      </select>
+    </label>
+    <button id="pause">Pause</button>
+    <button id="restart">Neustart</button>
   </div>
-
-  <section id="start" class="screen active scan">
-    <div class="panel">
-      <div class="card">
-        <h2>Spielerisch zum Bildungsurlaub</h2>
-        <p>Du kämpfst dich durch ein Retro-Pong-Match: Jeder Ballwechsel steht für Wissen, Planung und gute Argumente für deinen <b>Bildungsurlaub</b>.</p>
-        <div class="icons">
-          <div class="icon">📚 Lernen</div>
-          <div class="icon">🗓️ Freistellung</div>
-          <div class="icon">💼 Job & Weiterbildung</div>
-        </div>
-        <p class="small">Steuerung: <b>Maus/Touch</b> oder <b>W/S, ↑/↓</b>. Erst 7 Punkte gewinnt.</p>
-        <div class="seg" role="radiogroup" aria-label="Schwierigkeit">
-          <input id="easy" name="diff" type="radio" checked><label for="easy">Easy</label>
-          <input id="normal" name="diff" type="radio"><label for="normal">Normal</label>
-          <input id="hard" name="diff" type="radio"><label for="hard">Hard</label>
-        </div>
-        <div class="cta">
-          <button id="startBtn" class="primary">Spiel starten</button>
-        </div>
-      </div>
-      <div class="aside">
-        <h2 style="color:var(--accent2)">Kurzinfo</h2>
-        <div class="list">
-          <div class="item"><span>🎯</span><div><b>Ziel:</b> Schlage die KI im Retro-Duell.</div></div>
-          <div class="item"><span>⚡</span><div><b>Tempo:</b> Nach jedem Treffer wird der Ball etwas schneller.</div></div>
-          <div class="item"><span>⏸️</span><div><b>Pause:</b> Jederzeit oben rechts oder mit <b>P</b>.</div></div>
-          <div class="item"><span>💡</span><div><b>Tipp:</b> Harte Level reagieren schneller und bewegen sich präziser.</div></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="game" class="screen">
-    <div class="gamebar">
-      <div class="status">
-        <div class="score"><span id="ps">0</span> : <span id="cs">0</span></div>
-        <div class="badge" id="diffBadge">Easy</div>
-        <div class="badge" id="msg">Ball bereit</div>
-      </div>
-      <div class="controls">
-        <button id="restartBtn" class="small warn">Neustart</button>
-      </div>
-    </div>
-    <div id="wrap">
-      <canvas id="cv"></canvas>
-      <div id="pauseOverlay" class="overlay">
-        <div class="modal">
-          <h3>Pausiert</h3>
-          <p>Bildungsurlaub kurz unterbrochen.</p>
-          <div class="cta">
-            <button id="resumeBtn" class="primary">Fortsetzen</button>
-            <button id="rebootBtn" class="accent">Neustart</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="help">Steuerung: Maus/Touch oder W/S, ↑/↓ · P = Pause</div>
-  </section>
-
-  <section id="end" class="screen scan">
-    <div class="endbox">
-      <div class="arc">📚 🏓 💼</div>
-      <div id="endTitle" class="big win">Gewonnen!</div>
-      <p id="endText">Du hast den Bildungsurlaub souverän verteidigt.</p>
-      <div class="cta" style="justify-content:center">
-        <button id="againBtn" class="primary">Nochmal spielen</button>
-      </div>
-    </div>
-  </section>
+  <canvas id="canvas" width="640" height="360" tabindex="0"></canvas>
+  <div id="overlay" style="display:none;">
+    <h2 id="result"></h2>
+    <button id="again">Nochmal spielen</button>
+  </div>
 </div>
-
 <script>
-const startScreen = document.getElementById('start');
-const gameScreen = document.getElementById('game');
-const endScreen = document.getElementById('end');
-const pauseOverlay = document.getElementById('pauseOverlay');
-const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
-const psEl = document.getElementById('ps'), csEl = document.getElementById('cs');
-const msgEl = document.getElementById('msg'), diffBadge = document.getElementById('diffBadge');
-const endTitle = document.getElementById('endTitle'), endText = document.getElementById('endText');
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+let W=640,H=360;
+function resize() {
+  const rW = Math.min(window.innerWidth*0.98,900);
+  const rH = Math.min(window.innerHeight*0.7,500);
+  let scale = Math.min(rW/640, rH/360, 1);
+  W = Math.round(640*scale); H = Math.round(360*scale);
+  canvas.width=W; canvas.height=H;
+}
+resize();
+window.addEventListener('resize',resize);
 
-const D = {
-  easy:{name:'Easy', ai:310, react:.085, err:34},
-  normal:{name:'Normal', ai:430, react:.13, err:18},
-  hard:{name:'Hard', ai:590, react:.2, err:8}
+const paddleW = ()=>Math.round(W*0.018), paddleH = ()=>Math.round(H*0.18), ballR = ()=>Math.round(W*0.018);
+const netW = ()=>Math.round(W*0.012), netH = ()=>Math.round(H*0.04);
+
+let gameState, playerY, aiY, ball, ballSpeed, ballVel, playerScore, aiScore, paused, winner, diff, aiErr, aiSpeed, lastTouch, trail;
+const maxScore=7;
+const diffSettings = {
+  easy:{aiErr:0.25,aiSpeed:0.09,ball:4.2},
+  medium:{aiErr:0.13,aiSpeed:0.13,ball:5.2},
+  hard:{aiErr:0.05,aiSpeed:0.19,ball:6.2}
 };
-let diff = D.easy, running = false, paused = false, ended = false, raf = 0, last = 0;
-let W=800,H=380, pointerY=H/2, keyDir=0, flash=0, shake=0, particles=[];
-const game = {
-  win:7, player:0, cpu:0,
-  paddle:{w:12,h:76,margin:16,speed:520},
-  playerP:{x:0,y:0},
-  cpuP:{x:0,y:0,aim:0},
-  ball:{x:0,y:0,vx:0,vy:0,r:7,speed:320,trail:[]}
-};
-
-function setScreen(s){
-  startScreen.classList.remove('active'); gameScreen.classList.remove('active'); endScreen.classList.remove('active');
-  s.classList.add('active');
+function resetGame(initDiff) {
+  diff = diffSettings[initDiff||document.getElementById('difficulty').value];
+  playerY = H/2-paddleH()/2;
+  aiY = H/2-paddleH()/2;
+  playerScore = 0; aiScore = 0;
+  ballSpeed = diff.ball;
+  ball = {x:W/2,y:H/2};
+  ballVel = {x:Math.random()<0.5?-1:1,y:(Math.random()-0.5)*1.2};
+  paused = false; winner = null; lastTouch='player';
+  trail = [];
+  updateScore();
+  document.getElementById('overlay').style.display='none';
 }
-function fit(){
-  const r = document.getElementById('wrap').getBoundingClientRect();
-  cv.width = W = Math.max(320, Math.floor(r.width * devicePixelRatio));
-  cv.height = H = Math.max(180, Math.floor(r.height * devicePixelRatio));
-  ctx.setTransform(1,0,0,1,0,0);
-  pointerY = H/2;
-  placePaddles();
+function serve(dir) {
+  ball.x=W/2; ball.y=H/2;
+  let angle = (Math.random()-0.5)*0.9;
+  ballVel.x = dir*(0.9+Math.random()*0.3);
+  ballVel.y = angle;
+  ballSpeed = diff.ball;
+  lastTouch = dir<0?'ai':'player';
+  trail = [];
 }
-function placePaddles(){
-  const p=game.paddle;
-  p.w = Math.max(9, W*.015);
-  p.h = Math.max(52, H*.21);
-  p.margin = Math.max(12, W*.02);
-  game.playerP.x = p.margin; game.cpuP.x = W-p.margin-p.w;
-  game.playerP.y = clamp(game.playerP.y||H/2-p.h/2,0,H-p.h);
-  game.cpuP.y = clamp(game.cpuP.y||H/2-p.h/2,0,H-p.h);
+function updateScore() {
+  document.getElementById('score').textContent = playerScore+' : '+aiScore;
 }
-function resetBall(dir=1){
-  const b=game.ball;
-  b.x=W/2; b.y=H/2; b.speed=Math.max(290,Math.min(520, 300 + (game.player+game.cpu)*8));
-  const ang=(Math.random()*.9-.45);
-  b.vx=Math.cos(ang)*b.speed*dir;
-  b.vy=Math.sin(ang)*b.speed;
-  b.trail.length=0;
-  msg("Neuer Ball");
-}
-function fullReset(){
-  game.player=0; game.cpu=0; psEl.textContent=0; csEl.textContent=0; particles.length=0;
-  placePaddles(); resetBall(Math.random()<.5?-1:1); flash=0; shake=0;
-}
-function startGame(){
-  diff = document.getElementById('hard').checked ? D.hard : document.getElementById('normal').checked ? D.normal : D.easy;
-  diffBadge.textContent = diff.name;
-  setScreen(gameScreen);
-  ended=false; paused=false; pauseOverlay.classList.remove('show');
-  fullReset();
-  running=true; last=performance.now(); cancelAnimationFrame(raf); raf=requestAnimationFrame(loop);
-}
-function endGame(win){
-  running=false; ended=true;
-  endTitle.textContent = win ? 'Gewonnen!' : 'Verloren!';
-  endTitle.className = 'big ' + (win?'win':'lose');
-  endText.textContent = win ? 'Du hast den Computer im Bildungsurlaub-Pong besiegt.' : 'Der Computer war schneller. Starte neu und sichere dir den Punkt.';
-  setScreen(endScreen);
-}
-function pauseToggle(force){
-  if(!gameScreen.classList.contains('active') || ended) return;
-  paused = force!==undefined ? force : !paused;
-  pauseOverlay.classList.toggle('show', paused);
-  msg(paused ? "Pausiert" : "Weiter");
-  if(!paused && running){ last=performance.now(); raf=requestAnimationFrame(loop); }
-}
-function msg(t){ msgEl.textContent=t; }
-function clamp(v,a,b){ return v<a?a:v>b?b:v; }
-
-function hitSound(freq=420, dur=.05, type='square', vol=.02){
-  try{
-    const A = hitSound.ctx || (hitSound.ctx = new (window.AudioContext||window.webkitAudioContext)());
-    if (A.state === 'suspended') A.resume();
-    const o=A.createOscillator(), g=A.createGain();
-    o.type=type; o.frequency.value=freq; g.gain.value=vol;
-    o.connect(g); g.connect(A.destination);
-    o.start();
-    g.gain.exponentialRampToValueAtTime(.0001, A.currentTime+dur);
-    o.stop(A.currentTime+dur);
-  }catch(e){}
-}
-function burst(x,y,c,n=12){
-  for(let i=0;i<n;i++){
-    const a=Math.random()*Math.PI*2, s=60+Math.random()*180;
-    particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:.25+.25*Math.random(),max:.45,c});
+function drawNet() {
+  ctx.save();
+  ctx.fillStyle='#3a4470';
+  for(let y=0;y<H;y+=netH()*2){
+    ctx.fillRect(W/2-netW()/2,y,netW(),netH());
   }
-}
-function update(dt){
-  const p=game.paddle, pl=game.playerP, ai=game.cpuP, b=game.ball;
-  const keySpeed = p.speed*dt*keyDir;
-  if(keyDir) pl.y += keySpeed;
-  const target = pointerY - p.h/2;
-  pl.y += (target - pl.y) * Math.min(1, 12*dt);
-  pl.y = clamp(pl.y,0,H-p.h);
-
-  ai.aim += ((b.y + (Math.random()*2-1)*diff.err) - ai.aim) * diff.react;
-  const aiCenter = ai.y + p.h/2;
-  const dy = ai.aim - aiCenter;
-  ai.y += clamp(dy, -diff.ai*dt, diff.ai*dt);
-  ai.y = clamp(ai.y,0,H-p.h);
-
-  b.x += b.vx*dt; b.y += b.vy*dt;
-  b.trail.push({x:b.x,y:b.y,a:1});
-  if(b.trail.length>8) b.trail.shift();
-
-  if(b.y-b.r<0){ b.y=b.r; b.vy=Math.abs(b.vy); flash=.15; hitSound(220,.03,'square',.012); }
-  if(b.y+b.r>H){ b.y=H-b.r; b.vy=-Math.abs(b.vy); flash=.15; hitSound(220,.03,'square',.012); }
-
-  if(collide(pl,b,true) || collide(ai,b,false)){
-    b.speed*=1.045;
-    const dir = b.vx<0?1:-1;
-    b.vx = dir * Math.max(Math.abs(b.vx), b.speed*.88);
-    flash=.28; shake=8; burst(b.x,b.y, dir>0 ? '#30f2c2' : '#ff4db8', 10);
-    hitSound(420 + Math.random()*100,.045,'square',.02);
-    msg("Treffer!");
-  }
-
-  if(b.x+b.r<0){
-    game.cpu++; csEl.textContent=game.cpu; hitSound(160,.12,'sawtooth',.03); burst(20,b.y,'#ff6b6b',14); msg("Computer punktet");
-    if(game.cpu>=game.win) return endGame(false);
-    resetBall(1);
-  } else if(b.x-b.r>W){
-    game.player++; psEl.textContent=game.player; hitSound(620,.12,'triangle',.03); burst(W-20,b.y,'#30f2c2',14); msg("Punkt für dich");
-    if(game.player>=game.win) return endGame(true);
-    resetBall(-1);
-  }
-
-  for(let i=particles.length-1;i>=0;i--){
-    const q=particles[i]; q.life-=dt; if(q.life<=0) particles.splice(i,1);
-    else { q.x+=q.vx*dt; q.y+=q.vy*dt; q.vx*=.985; q.vy*=.985; }
-  }
-  flash=Math.max(0,flash-dt*1.5); shake=Math.max(0,shake-dt*40);
-}
-function collide(p,b,left){
-  if(b.x+b.r<p.x || b.x-b.r>p.x+game.paddle.w || b.y+b.r<p.y || b.y-b.r>p.y+game.paddle.h) return false;
-  if(left && b.vx<0 || !left && b.vx>0){
-    const rel = ((b.y-(p.y+game.paddle.h/2))/(game.paddle.h/2));
-    const angle = rel*1.02;
-    const speed = Math.hypot(b.vx,b.vy)*1.02;
-    b.vx = (left?1:-1) * Math.cos(angle)*speed;
-    b.vy = Math.sin(angle)*speed + (Math.random()*18-9);
-    b.x = left ? p.x+game.paddle.w+b.r+.5 : p.x-b.r-.5;
-    return true;
-  }
-  return false;
-}
-function draw(){
-  ctx.clearRect(0,0,W,H);
-  const ox=(Math.random()-.5)*shake, oy=(Math.random()-.5)*shake;
-  ctx.save(); ctx.translate(ox,oy);
-
-  ctx.fillStyle='rgba(255,255,255,.03)';
-  for(let y=0;y<H;y+=6) ctx.fillRect(0,y,W,1);
-
-  ctx.strokeStyle='rgba(143,179,199,.26)';
-  ctx.lineWidth=2;
-  for(let y=8;y<H;y+=22) ctx.strokeRect(W/2-1,y,2,12);
-
-  ctx.fillStyle='rgba(48,242,194,.08)';
-  ctx.fillRect(0,0,W,H*flash*.25);
-  ctx.fillStyle='rgba(255,77,184,.06)';
-  ctx.fillRect(0,H-H*flash*.2,W,H*flash*.2);
-
-  drawPaddle(game.playerP.x,game.playerP.y,'#30f2c2');
-  drawPaddle(game.cpuP.x,game.cpuP.y,'#ff4db8');
-
-  for(let i=0;i<game.ball.trail.length;i++){
-    const t=game.ball.trail[i], a=(i+1)/game.ball.trail.length;
-    ctx.beginPath(); ctx.fillStyle=`rgba(255,230,109,${a*.15})`;
-    ctx.arc(t.x,t.y,game.ball.r*(.35+a*.55),0,Math.PI*2); ctx.fill();
-  }
-  for(const q of particles){
-    ctx.globalAlpha=Math.max(0,q.life/q.max);
-    ctx.fillStyle=q.c; ctx.fillRect(q.x,q.y,3,3);
-  }
-  ctx.globalAlpha=1;
-  ctx.beginPath(); ctx.fillStyle='#ffe66d'; ctx.shadowBlur=12; ctx.shadowColor='rgba(255,230,109,.55)';
-  ctx.arc(game.ball.x,game.ball.y,game.ball.r,0,Math.PI*2); ctx.fill();
-  ctx.shadowBlur=0;
   ctx.restore();
 }
-function drawPaddle(x,y,c){
-  ctx.fillStyle=c; ctx.shadowBlur=10; ctx.shadowColor=c;
-  ctx.fillRect(x,y,game.paddle.w,game.paddle.h);
-  ctx.shadowBlur=0;
-  ctx.fillStyle='rgba(255,255,255,.22)';
-  ctx.fillRect(x+2,y+2,Math.max(2,game.paddle.w-4),4);
+function drawPaddle(x,y) {
+  ctx.save();
+  ctx.fillStyle='#f7e06b';
+  ctx.shadowColor='#ffe066';
+  ctx.shadowBlur=8;
+  ctx.fillRect(x,y,paddleW(),paddleH());
+  ctx.restore();
 }
-function loop(t){
-  if(!running || paused) return;
-  const dt = Math.min(.018,(t-last)/1000); last=t;
-  update(dt); draw(); raf=requestAnimationFrame(loop);
+function drawBall() {
+  // Trail
+  for(let i=trail.length-1;i>=0;i--){
+    let t=trail[i],a=(i+1)/trail.length;
+    ctx.save();
+    ctx.globalAlpha=0.13*a;
+    ctx.beginPath();
+    ctx.arc(t.x,t.y,ballR()+i*1.2,0,2*Math.PI);
+    ctx.fillStyle='#6be0f7';
+    ctx.shadowColor='#6be0f7';
+    ctx.shadowBlur=12*a;
+    ctx.fill();
+    ctx.restore();
+  }
+  // Ball
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(ball.x,ball.y,ballR(),0,2*Math.PI);
+  ctx.fillStyle='#6be0f7';
+  ctx.shadowColor='#6be0f7';
+  ctx.shadowBlur=18;
+  ctx.fill();
+  ctx.restore();
 }
-function pointerMove(clientY){
-  const r=cv.getBoundingClientRect();
-  pointerY = (clientY-r.top) * (cv.height/r.height);
+function draw() {
+  ctx.clearRect(0,0,W,H);
+  drawNet();
+  drawPaddle(0,playerY);
+  drawPaddle(W-paddleW(),aiY);
+  drawBall();
 }
-cv.addEventListener('mousemove',e=>pointerMove(e.clientY));
-cv.addEventListener('touchstart',e=>{ if(e.touches[0]) pointerMove(e.touches[0].clientY); }, {passive:true});
-cv.addEventListener('touchmove',e=>{ if(e.touches[0]) pointerMove(e.touches[0].clientY); }, {passive:true});
-
-addEventListener('keydown',e=>{
-  if(e.key==='w'||e.key==='W'||e.key==='ArrowUp') keyDir=-1;
-  if(e.key==='s'||e.key==='S'||e.key==='ArrowDown') keyDir=1;
-  if(e.key==='p'||e.key==='P') pauseToggle();
-  if(e.key==='Escape') setScreen(startScreen), running=false, paused=false;
+function clamp(val,min,max){return Math.max(min,Math.min(max,val));}
+function playSound(type){
+  try{
+    let ctxA=new(window.AudioContext||window.webkitAudioContext)();
+    let o=ctxA.createOscillator(),g=ctxA.createGain();
+    o.type='square';
+    if(type==='paddle'){o.frequency.value=420;}
+    else if(type==='score'){o.frequency.value=220;}
+    else{o.frequency.value=320;}
+    g.gain.value=0.11;
+    o.connect(g);g.connect(ctxA.destination);
+    o.start();
+    o.stop(ctxA.currentTime+0.09);
+    setTimeout(()=>ctxA.close(),120);
+  }catch(e){}
+}
+function step() {
+  if(paused||winner) return;
+  // AI movement
+  let aiCenter = aiY+paddleH()/2;
+  let target = ball.y + (Math.random()-0.5)*diff.aiErr*H;
+  if(aiCenter<target-8) aiY+=aiSpeed*H;
+  else if(aiCenter>target+8) aiY-=aiSpeed*H;
+  aiY=clamp(aiY,0,H-paddleH());
+  // Ball movement
+  for(let sub=0;sub<2;sub++){ // Prevent tunneling
+    ball.x+=ballVel.x*ballSpeed/2;
+    ball.y+=ballVel.y*ballSpeed/2;
+    // Wall bounce
+    if(ball.y-ballR()<0){ball.y=ballR();ballVel.y=Math.abs(ballVel.y);playSound('wall');}
+    if(ball.y+ballR()>H){ball.y=H-ballR();ballVel.y=-Math.abs(ballVel.y);playSound('wall');}
+    // Paddle collision
+    // Left (player)
+    if(ball.x-ballR()<paddleW()+2){
+      if(ball.y>playerY-2&&ball.y<playerY+paddleH()+2){
+        ball.x=paddleW()+ballR()+2;
+        let rel=(ball.y-(playerY+paddleH()/2))/(paddleH()/2);
+        ballVel.x=Math.abs(ballVel.x);
+        ballVel.y=rel*1.2;
+        ballSpeed*=1.09;
+        lastTouch='player';
+        playSound('paddle');
+      }
+    }
+    // Right (AI)
+    if(ball.x+ballR()>W-paddleW()-2){
+      if(ball.y>aiY-2&&ball.y<aiY+paddleH()+2){
+        ball.x=W-paddleW()-ballR()-2;
+        let rel=(ball.y-(aiY+paddleH()/2))/(paddleH()/2);
+        ballVel.x=-Math.abs(ballVel.x);
+        ballVel.y=rel*1.2;
+        ballSpeed*=1.09;
+        lastTouch='ai';
+        playSound('paddle');
+      }
+    }
+    // Score
+    if(ball.x+ballR()<0){
+      aiScore++;
+      updateScore();
+      playSound('score');
+      if(aiScore>=maxScore){winner='ai';showOverlay();}
+      else serve(1);
+      return;
+    }
+    if(ball.x-ballR()>W){
+      playerScore++;
+      updateScore();
+      playSound('score');
+      if(playerScore>=maxScore){winner='player';showOverlay();}
+      else serve(-1);
+      return;
+    }
+  }
+  // Trail
+  trail.push({x:ball.x,y:ball.y});
+  if(trail.length>16) trail.shift();
+}
+function loop() {
+  if(!paused&&!winner) step();
+  draw();
+  requestAnimationFrame(loop);
+}
+function showOverlay(){
+  const o=document.getElementById('overlay');
+  o.style.display='flex';
+  let r=document.getElementById('result');
+  if(winner==='player') r.textContent='Gewonnen! Bildungsurlaub erreicht 🎉';
+  else r.textContent='Verloren! Versuche es erneut.';
+}
+document.getElementById('again').onclick=()=>{resetGame();};
+document.getElementById('restart').onclick=()=>{resetGame();};
+document.getElementById('pause').onclick=()=>{
+  if(winner) return;
+  paused=!paused;
+  document.getElementById('pause').textContent=paused?'Fortsetzen':'Pause';
+};
+document.getElementById('difficulty').onchange=()=>{
+  resetGame(document.getElementById('difficulty').value);
+};
+canvas.addEventListener('pointerdown',e=>{
+  let rect=canvas.getBoundingClientRect();
+  let y=(e.clientY-rect.top)/rect.height*H;
+  playerY=clamp(y-paddleH()/2,0,H-paddleH());
 });
-addEventListener('keyup',e=>{
-  if(['w','W','ArrowUp','s','S','ArrowDown'].includes(e.key)) keyDir=0;
+canvas.addEventListener('pointermove',e=>{
+  if(e.buttons){
+    let rect=canvas.getBoundingClientRect();
+    let y=(e.clientY-rect.top)/rect.height*H;
+    playerY=clamp(y-paddleH()/2,0,H-paddleH());
+  }
 });
-
-document.getElementById('startBtn').onclick=startGame;
-document.getElementById('againBtn').onclick=()=>{ setScreen(startScreen); };
-document.getElementById('pauseBtn').onclick=()=>pauseToggle();
-document.getElementById('resumeBtn').onclick=()=>pauseToggle(false);
-document.getElementById('restartBtn').onclick=()=>{ running=false; paused=false; setScreen(startScreen); };
-document.getElementById('rebootBtn').onclick=()=>{ paused=false; startGame(); };
-document.getElementById('homeBtn').onclick=()=>{ running=false; paused=false; ended=false; setScreen(startScreen); };
-
-new ResizeObserver(fit).observe(document.getElementById('wrap'));
-setTimeout(fit,30);
-msg("Ball bereit");
+canvas.addEventListener('touchstart',e=>{
+  if(e.touches.length){
+    let rect=canvas.getBoundingClientRect();
+    let y=(e.touches[0].clientY-rect.top)/rect.height*H;
+    playerY=clamp(y-paddleH()/2,0,H-paddleH());
+  }
+});
+canvas.addEventListener('touchmove',e=>{
+  if(e.touches.length){
+    let rect=canvas.getBoundingClientRect();
+    let y=(e.touches[0].clientY-rect.top)/rect.height*H;
+    playerY=clamp(y-paddleH()/2,0,H-paddleH());
+  }
+});
+document.addEventListener('keydown',e=>{
+  if(document.activeElement!==canvas&&document.activeElement!==document.body)return;
+  if(e.key==='ArrowUp'||e.key==='w'){playerY=clamp(playerY-0.09*H,0,H-paddleH());}
+  if(e.key==='ArrowDown'||e.key==='s'){playerY=clamp(playerY+0.09*H,0,H-paddleH());}
+  if(e.key===' '){document.getElementById('pause').click();}
+  if(e.key==='r'){resetGame();}
+});
+canvas.tabIndex=0;
+canvas.style.outline='none';
+canvas.addEventListener('focus',()=>{});
+function init() {
+  aiErr=diff.aiErr; aiSpeed=diff.aiSpeed;
+  resetGame();
+  loop();
+}
+init();
 </script>
 </body>
 </html>
